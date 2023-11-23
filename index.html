@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RRSB Scoreboard</title>
+    <style>
+      #date-selector {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 60%;
+        margin: 20px auto;
+      }
+
+      #current-date {
+        margin: 0 10px;
+      }
+
+      #breaks-table {
+        width: 60%;
+        margin: 20px auto;
+        border-collapse: collapse;
+      }
+
+      #breaks-table th,
+      #breaks-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      #breaks-table th {
+        background-color: #f2f2f2;
+      }
+
+      /* Mobile styles */
+      @media screen and (max-width: 768px) {
+        #date-selector,
+        #breaks-table {
+          width: 100%;
+        }
+
+        #date-selector {
+          flex-direction: row;
+        }
+
+        #current-date {
+          flex: 1; /* Allows the date input to grow and fill the space */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="date-selector">
+      <button id="prev-date">&lt;</button>
+      <input type="date" id="current-date" />
+      <button id="next-date">&gt;</button>
+    </div>
+    <table id="breaks-table">
+      <thead>
+        <tr>
+          <th>Player Name</th>
+          <th>High Breaks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data rows will be added here -->
+      </tbody>
+    </table>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentDateInput = document.getElementById("current-date");
+        const prevDateButton = document.getElementById("prev-date");
+        const nextDateButton = document.getElementById("next-date");
+
+        currentDateInput.valueAsDate = new Date();
+        fetchAndDisplayBreaks(currentDateInput.value);
+
+        currentDateInput.addEventListener("change", function () {
+          fetchAndDisplayBreaks(currentDateInput.value);
+        });
+
+        prevDateButton.addEventListener("click", function () {
+          changeDate(-1);
+        });
+
+        nextDateButton.addEventListener("click", function () {
+          changeDate(1);
+        });
+
+        function changeDate(days) {
+          let currentDate = new Date(currentDateInput.value);
+          currentDate.setDate(currentDate.getDate() + days);
+          currentDateInput.valueAsDate = currentDate;
+          fetchAndDisplayBreaks(currentDateInput.value);
+        }
+
+        function fetchAndDisplayBreaks(date) {
+          fetch(`https://rrsb-scoreboard-server.onrender.com/breaks/${date}`)
+            .then((response) => response.json())
+            .then((data) => updateTable(data.data))
+            .catch((error) => console.error("Error fetching data:", error));
+        }
+
+        function updateTable(data) {
+          const tableBody = document
+            .getElementById("breaks-table")
+            .querySelector("tbody");
+          tableBody.innerHTML = ""; // Clear existing rows
+
+          data.forEach((player) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${player.name}</td>
+                        <td>${player.highbreaks.join(", ")}</td>
+                    `;
+            tableBody.appendChild(row);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
