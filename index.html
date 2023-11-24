@@ -1,77 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>RRSB Scoreboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RRSB Statistics</title>
     <style>
-      #date-selector {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 60%;
-        margin: 20px auto;
+      body {
+        font-family: Arial, sans-serif;
       }
-
-      #current-date {
-        margin: 0 10px;
-      }
-
-      #breaks-table {
+      .container {
         width: 60%;
-        margin: 20px auto;
+        margin: 0 auto;
+      }
+      .date-selector,
+      .table-container {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        margin-top: 10px;
         border-collapse: collapse;
       }
-
-      #breaks-table th,
-      #breaks-table td {
+      th,
+      td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
       }
-
-      #breaks-table th {
+      th {
         background-color: #f2f2f2;
       }
-
-      /* Mobile styles */
       @media screen and (max-width: 768px) {
-        #date-selector,
-        #breaks-table {
+        .container {
           width: 100%;
-        }
-
-        #date-selector {
-          flex-direction: row;
-        }
-
-        #current-date {
-          flex: 1; /* Allows the date input to grow and fill the space */
+          padding: 0 10px;
+          box-sizing: border-box;
         }
       }
     </style>
   </head>
   <body>
-    <div id="date-selector">
-      <button id="prev-date">&lt;</button>
-      <input type="date" id="current-date" />
-      <button id="next-date">&gt;</button>
+    <div class="container">
+      <div class="date-selector">
+        <button id="prev-date">&lt;</button>
+        <input type="date" id="current-date" />
+        <button id="next-date">&gt;</button>
+      </div>
+      <label>
+        <input type="checkbox" id="toggle-leaderboard" />
+        Show all-time breaks leaderboard
+      </label>
+      <div class="table-container">
+        <h2>Daily Breaks</h2>
+        <table id="breaks-table">
+          <thead>
+            <tr>
+              <th>Player Name</th>
+              <th>High Breaks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data rows will be added here dynamically -->
+          </tbody>
+        </table>
+      </div>
+      <hr />
+      <div
+        class="table-container"
+        id="leaderboard-container"
+        style="display: none"
+      >
+        <h2>Breaks Leaderboard All-Time</h2>
+        <table id="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Player Name</th>
+              <th>High Breaks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Leaderboard data rows will be added here dynamically -->
+          </tbody>
+        </table>
+      </div>
     </div>
-    <table id="breaks-table">
-      <thead>
-        <tr>
-          <th>Player Name</th>
-          <th>High Breaks</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Data rows will be added here -->
-      </tbody>
-    </table>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const currentDateInput = document.getElementById("current-date");
         const prevDateButton = document.getElementById("prev-date");
         const nextDateButton = document.getElementById("next-date");
+        const leaderboardContainer = document.getElementById(
+          "leaderboard-container"
+        );
+        const toggleLeaderboardCheckbox =
+          document.getElementById("toggle-leaderboard");
 
         currentDateInput.valueAsDate = new Date();
         fetchAndDisplayBreaks(currentDateInput.value);
@@ -88,6 +112,13 @@
           changeDate(1);
         });
 
+        toggleLeaderboardCheckbox.addEventListener("change", function () {
+          leaderboardContainer.style.display = this.checked ? "block" : "none";
+          if (this.checked) {
+            fetchAndDisplayLeaderboard();
+          }
+        });
+
         function changeDate(days) {
           let currentDate = new Date(currentDateInput.value);
           currentDate.setDate(currentDate.getDate() + days);
@@ -98,13 +129,24 @@
         function fetchAndDisplayBreaks(date) {
           fetch(`https://rrsb-scoreboard-server.onrender.com/breaks/${date}`)
             .then((response) => response.json())
-            .then((data) => updateTable(data.data))
+            .then((data) => updateTable("breaks-table", data.data))
             .catch((error) => console.error("Error fetching data:", error));
         }
 
-        function updateTable(data) {
+        function fetchAndDisplayLeaderboard() {
+          fetch(
+            "https://rrsb-scoreboard-server.onrender.com/breaks/leaderboard"
+          )
+            .then((response) => response.json())
+            .then((data) => updateTable("leaderboard-table", data.data))
+            .catch((error) =>
+              console.error("Error fetching leaderboard data:", error)
+            );
+        }
+
+        function updateTable(tableId, data) {
           const tableBody = document
-            .getElementById("breaks-table")
+            .getElementById(tableId)
             .querySelector("tbody");
           tableBody.innerHTML = ""; // Clear existing rows
 
