@@ -5,14 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RRSB Statistics</title>
     <style>
+      :root {
+        --background-color: #ffffff;
+        --text-color: #000000;
+        --table-header-bg-color: #f2f2f2;
+        --border-color: #ddd;
+      }
+      [data-theme="dark"] {
+        --background-color: #363537;
+        --text-color: #fafafa;
+        --table-header-bg-color: #555;
+        --border-color: #666;
+      }
       body {
         font-family: Arial, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+        margin: 0;
+        padding: 0;
       }
       .container {
         width: 60%;
         margin: 0 auto;
+        padding-top: 20px;
+      }
+      .mode-toggle-container {
+        display: flex;
+        justify-content: center; /* Centers the children horizontally */
+        padding: 10px 0; /* Adds padding on top and bottom */
       }
       .date-selector,
+      .toggle-container,
       .table-container {
         text-align: center;
         margin-bottom: 20px;
@@ -24,18 +48,23 @@
       }
       th,
       td {
-        border: 1px solid #ddd;
+        border: 1px solid var(--border-color);
         padding: 8px;
         text-align: left;
       }
       th {
-        background-color: #f2f2f2;
+        background-color: var(--table-header-bg-color);
+      }
+      .toggle-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
       }
       @media screen and (max-width: 768px) {
         .container {
           width: 100%;
           padding: 0 10px;
-          box-sizing: border-box;
         }
       }
     </style>
@@ -84,10 +113,79 @@
           </tbody>
         </table>
       </div>
+      <hr />
+      <div class="mode-toggle-container">
+        <svg
+          id="icon-sun"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather feather-sun"
+          style="cursor: pointer; display: none"
+        >
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg
+          id="icon-moon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather feather-moon"
+          style="cursor: pointer"
+        >
+          <path d="M21 12.79a9 9 0 1 1-11.95-9.14A7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </div>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+        const iconSun = document.getElementById("icon-sun");
+        const iconMoon = document.getElementById("icon-moon");
+
+        iconSun.addEventListener("click", function () {
+          document.documentElement.setAttribute("data-theme", "light");
+          iconSun.style.display = "none";
+          iconMoon.style.display = "block";
+        });
+
+        iconMoon.addEventListener("click", function () {
+          document.documentElement.setAttribute("data-theme", "dark");
+          iconMoon.style.display = "none";
+          iconSun.style.display = "block";
+        });
+
+        // Initialize the correct icon display based on the current theme
+        const currentTheme =
+          document.documentElement.getAttribute("data-theme");
+        if (currentTheme === "dark") {
+          iconMoon.style.display = "none";
+          iconSun.style.display = "block";
+        } else {
+          iconSun.style.display = "none";
+          iconMoon.style.display = "block";
+        }
+
         const currentDateInput = document.getElementById("current-date");
         const prevDateButton = document.getElementById("prev-date");
         const nextDateButton = document.getElementById("next-date");
