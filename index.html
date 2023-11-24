@@ -63,8 +63,17 @@
       }
       @media screen and (max-width: 768px) {
         .container {
-          width: 100%;
+          width: 95%; /* slightly reduced to account for padding/margin */
           padding: 0 10px;
+          box-sizing: border-box;
+        }
+
+        table {
+          width: 100%; /* ensures table is not wider than its container */
+        }
+
+        .table-container {
+          overflow-x: auto; /* allows table to scroll on x-axis on small screens */
         }
       }
     </style>
