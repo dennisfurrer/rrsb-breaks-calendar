@@ -448,12 +448,14 @@
 
         iconSun.addEventListener("click", function () {
           document.documentElement.setAttribute("data-theme", "light");
+          localStorage.setItem("theme", "light"); // Save theme preference
           iconSun.style.display = "none";
           iconMoon.style.display = "block";
         });
 
         iconMoon.addEventListener("click", function () {
           document.documentElement.setAttribute("data-theme", "dark");
+          localStorage.setItem("theme", "dark"); // Save theme preference
           iconMoon.style.display = "none";
           iconSun.style.display = "block";
         });
@@ -570,14 +572,20 @@
         }
       }
 
-      document.addEventListener("DOMContentLoaded", function () {
-        handleTabSwitching();
-      });
+      // Apply the saved theme preference
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        if (savedTheme === "dark") {
+          iconMoon.style.display = "none";
+          iconSun.style.display = "block";
+        } else {
+          iconSun.style.display = "none";
+          iconMoon.style.display = "block";
+        }
+      }
 
-      document.addEventListener("DOMContentLoaded", function () {
-        // Call your existing DOMContentLoaded functions here
-        handleTabSwitching();
-      });
+      handleTabSwitching();
     </script>
   </body>
 </html>
