@@ -643,12 +643,12 @@
             <div class="label">Score</div>
             <div class="points left">${
               isMatchLiveOnTableNow
-                ? JSON.parse(match.rawGameLog).players[0].helpscore || 0
+                ? JSON.parse(match.rawGameLog).players[0].score || 0
                 : 0
             }</div>
             <div class="points right">${
               isMatchLiveOnTableNow
-                ? JSON.parse(match.rawGameLog).players[1].helpscore || 0
+                ? JSON.parse(match.rawGameLog).players[1].score || 0
                 : 0
             }</div>
           </div>
