@@ -572,6 +572,8 @@
         }
       }
 
+      handleTabSwitching();
+
       // Apply the saved theme preference
       const savedTheme = localStorage.getItem("theme");
       if (savedTheme) {
@@ -584,8 +586,6 @@
           iconMoon.style.display = "block";
         }
       }
-
-      handleTabSwitching();
     </script>
   </body>
 </html>
