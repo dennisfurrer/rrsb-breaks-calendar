@@ -76,51 +76,325 @@
           overflow-x: auto; /* allows table to scroll on x-axis on small screens */
         }
       }
+
+      /* Snooker Scoreboard Component Styles */
+      .scoreboard {
+        font-family: "Arial", sans-serif;
+        margin-top: 20px;
+        text-align: center;
+        background-color: #000;
+        box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px,
+          rgba(17, 17, 26, 0.1) 0px 16px 56px,
+          rgba(17, 17, 26, 0.1) 0px 24px 80px;
+      }
+
+      .table-number {
+        font-size: 1.5em;
+        color: #000;
+      }
+
+      .names-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+      }
+
+      .player-name {
+        font-size: 1.5em;
+        color: #fff;
+      }
+
+      .frames {
+        background-color: orange;
+        border-radius: 15px;
+        margin: 0 auto;
+        width: 40%;
+      }
+
+      .frames-label {
+        padding-top: 2.5%;
+        text-align: center;
+        font-weight: bold;
+        color: #000;
+        font-size: 0.8rem;
+      }
+
+      .frames-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 10%;
+        padding-right: 10%;
+      }
+
+      .frames .frames-won,
+      .frames .best-of {
+        color: #000;
+      }
+
+      .frames .frames-won.left,
+      .frames .frames-won.right {
+        font-size: 2.5em;
+        flex-basis: 30%; /* Adjust the width as needed */
+        font-weight: bold;
+      }
+
+      .frames .best-of {
+        flex-basis: 40%; /* Adjust the width as needed */
+      }
+
+      .best-of {
+        font-size: 1.5rem;
+      }
+
+      .scores {
+        background-color: #333; /* Dark grey background */
+        color: #fff; /* White text */
+        border-radius: 15px; /* Rounded corners */
+        margin: 0 auto; /* Center the scores section */
+        width: 70%; /* Width of the scores section */
+        padding-left: 10px; /* Padding around the content */
+        padding-right: 10px; /* Padding around the content */
+        font-weight: bold; /* Bold text for the label */
+        display: flex; /* Use flexbox for layout */
+        justify-content: space-around; /* Distribute space around items */
+        align-items: center; /* Align items vertically */
+        position: relative; /* Needed for absolute positioning of children */
+      }
+
+      .scores .label {
+        position: absolute; /* Position label absolutely to center */
+        left: 0; /* Align to the left edge */
+        right: 0; /* Align to the right edge */
+        text-align: center; /* Center text horizontally */
+        color: #c1c1c1; /* White text color */
+        font-size: 0.8rem; /* Font size for the label */
+        top: 50%; /* Position halfway down the parent */
+        transform: translateY(
+          -50%
+        ); /* Offset by half the element's height to truly center */
+      }
+
+      .scores .points {
+        font-size: 3.5em; /* Large font size for the points */
+        margin: 0 5%; /* Margin on the sides */
+      }
+
+      /* Media query for responsive layout adjustments */
+      @media (max-width: 768px) {
+        .scores {
+          flex-direction: column; /* Stack children vertically on small screens */
+        }
+
+        .scores .label {
+          position: relative; /* Position label relatively */
+          top: auto; /* Reset top position */
+          transform: none; /* Reset transform */
+          padding-bottom: 10px; /* Space below the label */
+        }
+
+        .scores .points {
+          width: 100%; /* Full width for points on small screens */
+          padding: 5px 0; /* Padding above and below points */
+          margin: 0; /* Reset margins */
+          order: -1; /* Place the label above the points */
+        }
+      }
+
+      .breaks {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+        background-color: #00003a;
+      }
+
+      .breaks .breaks-list {
+        flex-grow: 1;
+        color: #5bb5ff;
+      }
+
+      .breaks .breaks-label {
+        flex-grow: 1;
+        color: #5bb5ff;
+        font-size: 1rem;
+      }
+
+      .left {
+        text-align: left;
+      }
+
+      .right {
+        text-align: right;
+      }
+
+      /* Add styles for player name alignment */
+      .player-name.left {
+        float: left;
+        text-align: center;
+        width: 50%;
+      }
+
+      .player-name.right {
+        float: right;
+        text-align: center;
+        width: 50%;
+      }
+
+      .scoreboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Create three columns */
+        grid-gap: 20px; /* This is the spacing between the scoreboards */
+        padding: 20px 0; /* Top and bottom padding */
+      }
+
+      .grid-item {
+        background: #333; /* Optional: if you want a background for each grid item */
+      }
+
+      @media screen and (max-width: 768px) {
+        .scoreboard-grid {
+          grid-template-columns: 1fr; /* On smaller screens, use a single column layout */
+        }
+      }
+
+      /* Header styles */
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+      }
+
+      .page-title {
+        text-align: center;
+        padding-right: 5%;
+        font-size: 1.5rem;
+        flex-grow: 1;
+      }
+
+      .burger-menu {
+        cursor: pointer;
+        font-size: 3rem;
+        display: flex;
+        align-items: center;
+        width: 5%;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
+      }
+      .burger-menu:hover {
+        cursor: hand;
+        color: #555;
+        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+      }
+      .menu-content {
+        display: none;
+        position: absolute;
+        background-color: var(--background-color);
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        padding: 12px 16px;
+        z-index: 1;
+      }
+      .menu-item {
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        color: var(--text-color);
+      }
+      .menu-item:hover {
+        background-color: var(--table-header-bg-color);
+      }
+      /* Add styles for hiding and showing content */
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="table-container">
-        <h2>Daily Breaks</h2>
-        <div class="date-selector">
-          <button id="prev-date">&lt;</button>
-          <input type="date" id="current-date" />
-          <button id="next-date">&gt;</button>
+      <div class="header">
+        <div class="burger-menu" onclick="toggleMenu()">☰</div>
+        <h2 id="pageTitle" class="page-title">Daily Breaks</h2>
+        <div class="menu-content" id="burgerMenuContent">
+          <a href="?tab=breaks" class="menu-item">Breaks</a>
+          <a href="?tab=livescores" class="menu-item">Live Scores</a>
         </div>
-        <table id="breaks-table">
-          <thead>
-            <tr>
-              <th>Player Name</th>
-              <th>High Breaks</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Data rows will be added here dynamically -->
-          </tbody>
-        </table>
       </div>
-      <hr />
-      <label>
-        <input type="checkbox" id="toggle-leaderboard" />
-        Show all-time breaks leaderboard
-      </label>
-      <div
-        class="table-container"
-        id="leaderboard-container"
-        style="display: none"
-      >
-        <h2>Breaks Leaderboard All-Time</h2>
-        <table id="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Player Name</th>
-              <th>High Breaks</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Leaderboard data rows will be added here dynamically -->
-          </tbody>
-        </table>
+
+      <!-- Breaks Content -->
+      <div id="breaksContent">
+        <div class="table-container">
+          <div class="date-selector">
+            <button id="prev-date">&lt;</button>
+            <input type="date" id="current-date" />
+            <button id="next-date">&gt;</button>
+          </div>
+          <table id="breaks-table">
+            <thead>
+              <tr>
+                <th>Player Name</th>
+                <th>High Breaks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data rows will be added here dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <hr />
+        <label>
+          <input type="checkbox" id="toggle-leaderboard" />
+          Show all-time breaks leaderboard
+        </label>
+        <div
+          class="table-container"
+          id="leaderboard-container"
+          style="display: none"
+        >
+          <h2>Breaks Leaderboard All-Time</h2>
+          <table id="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Player Name</th>
+                <th>High Breaks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Leaderboard data rows will be added here dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Live Scores Content -->
+      <div id="liveScoresContent" class="hidden">
+        <!-- The 3x3 grid of scoreboards here -->
+        <div class="grid-item">
+          <!-- Snooker Scoreboard Component -->
+          <div class="scoreboard">
+            <div class="names-container">
+              <div class="player-name left">Player One</div>
+              <div class="player-name right">Player Two</div>
+            </div>
+            <div class="frames">
+              <div class="frames-label">Frames</div>
+              <div class="frames-content">
+                <div class="frames-won left">1</div>
+                <div class="best-of">(7)</div>
+                <div class="frames-won right">0</div>
+              </div>
+            </div>
+            <div class="scores">
+              <div class="label">Score</div>
+              <div class="points left">11</div>
+              <div class="points right">12</div>
+            </div>
+            <div class="breaks">
+              <div class="breaks-list left">8, 8</div>
+              <div class="breaks-label">« Breaks >7 »</div>
+              <div class="breaks-list right">12</div>
+            </div>
+          </div>
+        </div>
       </div>
       <hr />
       <div class="mode-toggle-container">
@@ -266,6 +540,43 @@
             tableBody.appendChild(row);
           });
         }
+      });
+
+      function toggleMenu() {
+        var menu = document.getElementById("burgerMenuContent");
+        if (menu.style.display === "block") {
+          menu.style.display = "none";
+        } else {
+          menu.style.display = "block";
+        }
+      }
+
+      // Function to handle tab switching and updating the page title
+      function handleTabSwitching() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get("tab");
+        const pageTitleElement = document.getElementById("pageTitle");
+
+        if (tab === "livescores") {
+          document.getElementById("breaksContent").classList.add("hidden");
+          document
+            .getElementById("liveScoresContent")
+            .classList.remove("hidden");
+          pageTitleElement.textContent = "Live Scores";
+        } else {
+          document.getElementById("breaksContent").classList.remove("hidden");
+          document.getElementById("liveScoresContent").classList.add("hidden");
+          pageTitleElement.textContent = "Daily Breaks";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        handleTabSwitching();
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Call your existing DOMContentLoaded functions here
+        handleTabSwitching();
       });
     </script>
   </body>
