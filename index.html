@@ -615,6 +615,34 @@
 
       handleTabSwitching();
 
+      function concatName(fullName, surnamelength) {
+        let nameParts = fullName.split(" ");
+        let formattedName =
+          nameParts[0].substring(0, surnamelength) +
+          "." +
+          (nameParts[1] ? nameParts[1][0] : "");
+        return formattedName;
+      }
+
+      function formatName(fullName) {
+        let deviceWidth =
+          window.innerWidth > 0 ? window.innerWidth : screen.width;
+        let nameLength = fullName.length;
+        if (deviceWidth > 1900) {
+          return concatName(fullName, 15);
+        } else if (deviceWidth <= 1900 && deviceWidth > 1024) {
+          return concatName(fullName, 11);
+        } else if (deviceWidth <= 1024 && deviceWidth > 896) {
+          return concatName(fullName, 10);
+        } else if (deviceWidth <= 896 && deviceWidth > 768) {
+          return concatName(fullName, 9);
+        } else if (deviceWidth <= 768 && deviceWidth > 425) {
+          return concatName(fullName, 11);
+        } else if (deviceWidth <= 425) {
+          return concatName(fullName, 6);
+        }
+      }
+
       async function createScoreboardGrid() {
         let matches = [];
         try {
@@ -649,10 +677,14 @@
         <div class="scoreboard">
           <div class="names-container">
             <div class="player-name left">${
-              isMatchLiveOnTableNow ? match.player1Name : "Player One"
+              isMatchLiveOnTableNow
+                ? formatName(match.player1Name)
+                : "Player One"
             }</div>
             <div class="player-name right">${
-              isMatchLiveOnTableNow ? match.player2Name : "Player Two"
+              isMatchLiveOnTableNow
+                ? formatName(match.player2Name)
+                : "Player Two"
             }</div>
           </div>
           <div class="frames">
