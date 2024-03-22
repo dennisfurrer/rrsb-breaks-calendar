@@ -252,38 +252,47 @@
       }
 
       .breaks {
+        position: relative; /* Add this line */
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 5px;
         background-color: #00003a;
-      }
-
-      .breaks .breaks-list {
-        flex-grow: 1;
+        padding: 5px;
         color: #5bb5ff;
       }
 
-      .breaks .breaks-label {
-        flex-grow: 1;
+      .breaks-list {
+        display: flex;
+        list-style-type: none;
+        padding: 0;
+        margin: 0; /* Removes default margin */
+        gap: 8px;
+      }
+
+      .breaks-label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%); /* Combine both transforms */
         color: #5bb5ff;
         font-size: 1rem;
+        z-index: 1;
       }
 
       .left {
-        text-align: left;
+        justify-content: flex-start;
       }
 
       .right {
-        text-align: right;
+        justify-content: flex-end;
       }
 
       .names-container {
         display: flex;
         justify-content: space-between; /* Ensures that there is space between the two player components */
         padding: 0 5%; /* Adds padding to the left and right inside the container */
-        padding-top: 5px;
-        padding-bottom: 5px;
+        padding-top: 10px;
+        padding-bottom: 10px;
       }
 
       .player-component {
@@ -707,7 +716,7 @@
       }
 
       function formatName(fullName) {
-        if (!fullName) return "Player Name";
+        if (!fullName) return "Player";
         let deviceWidth =
           window.innerWidth > 0 ? window.innerWidth : screen.width;
         let nameLength = fullName.length;
@@ -717,8 +726,12 @@
           return concatName(fullName, 9);
         } else if (deviceWidth <= 1600 && deviceWidth > 1500) {
           return concatName(fullName, 9);
-        } else if (deviceWidth <= 1500 && deviceWidth > 1024) {
-          return concatName(fullName, 7);
+        } else if (deviceWidth <= 1500 && deviceWidth > 1200) {
+          return concatName(fullName, 6);
+        } else if (deviceWidth <= 1200 && deviceWidth > 1100) {
+          return concatName(fullName, 5);
+        } else if (deviceWidth <= 1100 && deviceWidth > 1024) {
+          return concatName(fullName, 4);
         } else if (deviceWidth <= 1024 && deviceWidth > 896) {
           return concatName(fullName, 7);
         } else if (deviceWidth <= 896 && deviceWidth > 768) {
@@ -755,6 +768,9 @@
 
         const gridContainer = document.querySelector(".scoreboard-grid");
         gridContainer.innerHTML = ""; // Clear any existing content
+
+        const limitBreaks =
+          window.innerWidth >= 768 && window.innerWidth <= 1500;
 
         for (let i = 1; i <= 9; i++) {
           const match = matches.find((m) => m.tableNumber === i);
@@ -815,14 +831,22 @@
               }</div>
             </div>
             <div class="breaks">
-              <div class="breaks-list left">${
-                isMatchLiveOnTableNow ? match.breaksPlayer1.join(", ") : "0"
-              }</div>
-              <div class="breaks-label">Breaks</div>
-              <div class="breaks-list right">${
-                isMatchLiveOnTableNow ? match.breaksPlayer2.join(", ") : "0"
-              }</div>
-            </div>
+        <div class="breaks-list left">${
+          isMatchLiveOnTableNow
+            ? limitBreaks
+              ? match.breaksPlayer1.slice(0, 3).join(", ")
+              : match.breaksPlayer1.slice(0, 5).join(", ")
+            : "0"
+        }</div>
+        <div class="breaks-label">Breaks</div>
+        <div class="breaks-list right">${
+          isMatchLiveOnTableNow
+            ? limitBreaks
+              ? match.breaksPlayer2.slice(0, 3).join(", ")
+              : match.breaksPlayer2.slice(0, 5).join(", ")
+            : "0"
+        }</div>
+      </div>
           </div>
         </div>
       `;
