@@ -734,12 +734,18 @@
           return concatName(fullName, 4);
         } else if (deviceWidth <= 1024 && deviceWidth > 896) {
           return concatName(fullName, 7);
-        } else if (deviceWidth <= 896 && deviceWidth > 768) {
+        } else if (deviceWidth <= 896 && deviceWidth > 820) {
           return concatName(fullName, 6);
-        } else if (deviceWidth <= 768 && deviceWidth > 425) {
-          return concatName(fullName, 9);
-        } else if (deviceWidth <= 425) {
+        } else if (deviceWidth <= 820 && deviceWidth > 768) {
+          return concatName(fullName, 5);
+        } else if (deviceWidth <= 768 && deviceWidth > 650) {
+          return concatName(fullName, 10);
+        } else if (deviceWidth <= 650 && deviceWidth > 550) {
+          return concatName(fullName, 8);
+        } else if (deviceWidth <= 550 && deviceWidth > 450) {
           return concatName(fullName, 6);
+        } else if (deviceWidth <= 450) {
+          return concatName(fullName, 5);
         }
       }
 
@@ -769,8 +775,7 @@
         const gridContainer = document.querySelector(".scoreboard-grid");
         gridContainer.innerHTML = ""; // Clear any existing content
 
-        const limitBreaks =
-          window.innerWidth >= 768 && window.innerWidth <= 1500;
+        const limitBreaks = window.innerWidth <= 1500;
 
         for (let i = 1; i <= 9; i++) {
           const match = matches.find((m) => m.tableNumber === i);
@@ -834,16 +839,16 @@
         <div class="breaks-list left">${
           isMatchLiveOnTableNow
             ? limitBreaks
-              ? match.breaksPlayer1.slice(0, 3).join(", ")
-              : match.breaksPlayer1.slice(0, 5).join(", ")
+              ? match.breaksPlayer1.slice(0, 3).join(", ") || "0"
+              : match.breaksPlayer1.slice(0, 5).join(", ") || "0"
             : "0"
         }</div>
         <div class="breaks-label">Breaks</div>
         <div class="breaks-list right">${
           isMatchLiveOnTableNow
             ? limitBreaks
-              ? match.breaksPlayer2.slice(0, 3).join(", ")
-              : match.breaksPlayer2.slice(0, 5).join(", ")
+              ? match.breaksPlayer2.slice(0, 3).join(", ") || "0"
+              : match.breaksPlayer2.slice(0, 5).join(", ") || "0"
             : "0"
         }</div>
       </div>
