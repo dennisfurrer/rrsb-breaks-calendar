@@ -282,6 +282,8 @@
         display: flex;
         justify-content: space-between; /* Ensures that there is space between the two player components */
         padding: 0 5%; /* Adds padding to the left and right inside the container */
+        padding-top: 5px;
+        padding-bottom: 5px;
       }
 
       .player-component {
@@ -712,13 +714,13 @@
         if (deviceWidth > 1900) {
           return concatName(fullName, 15);
         } else if (deviceWidth <= 1900 && deviceWidth > 1024) {
-          return concatName(fullName, 11);
+          return concatName(fullName, 7);
         } else if (deviceWidth <= 1024 && deviceWidth > 896) {
-          return concatName(fullName, 10);
+          return concatName(fullName, 7);
         } else if (deviceWidth <= 896 && deviceWidth > 768) {
-          return concatName(fullName, 9);
+          return concatName(fullName, 6);
         } else if (deviceWidth <= 768 && deviceWidth > 425) {
-          return concatName(fullName, 11);
+          return concatName(fullName, 9);
         } else if (deviceWidth <= 425) {
           return concatName(fullName, 6);
         }
