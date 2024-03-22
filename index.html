@@ -713,7 +713,11 @@
         let nameLength = fullName.length;
         if (deviceWidth > 1900) {
           return concatName(fullName, 15);
-        } else if (deviceWidth <= 1900 && deviceWidth > 1024) {
+        } else if (deviceWidth <= 1900 && deviceWidth > 1600) {
+          return concatName(fullName, 9);
+        } else if (deviceWidth <= 1600 && deviceWidth > 1500) {
+          return concatName(fullName, 9);
+        } else if (deviceWidth <= 1500 && deviceWidth > 1024) {
           return concatName(fullName, 7);
         } else if (deviceWidth <= 1024 && deviceWidth > 896) {
           return concatName(fullName, 7);
