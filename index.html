@@ -153,7 +153,7 @@
 
       .frames .frames-won.left,
       .frames .frames-won.right {
-        font-size: 2.5em;
+        font-size: 2em;
         flex-basis: 30%;
         /* Adjust the width as needed */
         font-weight: bold;
@@ -193,6 +193,7 @@
         /* Align items vertically */
         position: relative;
         /* Needed for absolute positioning of children */
+        flex-wrap: nowrap; /* This prevents flex items from wrapping */
       }
 
       .scores .label {
@@ -224,30 +225,22 @@
       /* Media query for responsive layout adjustments */
       @media (max-width: 768px) {
         .scores {
-          flex-direction: column;
-          /* Stack children vertically on small screens */
+          flex-direction: row; /* Keep the row direction even on small screens */
+          justify-content: space-between; /* Distribute space around items */
+          padding: 10px 20px; /* Adjust padding as needed */
         }
 
         .scores .label {
-          position: relative;
-          /* Position label relatively */
-          top: auto;
-          /* Reset top position */
-          transform: none;
-          /* Reset transform */
-          padding-bottom: 10px;
-          /* Space below the label */
+          display: none; /* Hide the label to save space */
         }
 
         .scores .points {
-          width: 100%;
-          /* Full width for points on small screens */
-          padding: 5px 0;
-          /* Padding above and below points */
+          font-size: 2em; /* Adjust font size for small screens */
+          /* Reset other styles that might cause layout issues */
+          padding: 0;
           margin: 0;
-          /* Reset margins */
-          order: -1;
-          /* Place the label above the points */
+          width: auto;
+          order: 0;
         }
       }
 
