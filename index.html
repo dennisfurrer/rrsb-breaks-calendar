@@ -11,12 +11,14 @@
         --table-header-bg-color: #f2f2f2;
         --border-color: #ddd;
       }
+
       [data-theme="dark"] {
         --background-color: #363537;
         --text-color: #fafafa;
         --table-header-bg-color: #555;
         --border-color: #666;
       }
+
       body {
         font-family: Arial, sans-serif;
         background-color: var(--background-color);
@@ -25,51 +27,63 @@
         margin: 0;
         padding: 0;
       }
+
       .container {
         width: 80%;
         margin: 0 auto;
         padding-top: 20px;
       }
+
       .mode-toggle-container {
         display: flex;
-        justify-content: center; /* Centers the children horizontally */
-        padding: 10px 0; /* Adds padding on top and bottom */
+        justify-content: center;
+        /* Centers the children horizontally */
+        padding: 10px 0;
+        /* Adds padding on top and bottom */
       }
+
       .date-selector,
       .toggle-container,
       .table-container {
         text-align: center;
         margin-bottom: 20px;
       }
+
       table {
         width: 100%;
         margin-top: 10px;
         border-collapse: collapse;
       }
+
       th,
       td {
         border: 1px solid var(--border-color);
         padding: 8px;
         text-align: left;
       }
+
       th {
         background-color: var(--table-header-bg-color);
       }
+
       .toggle-container {
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 10px;
       }
+
       @media screen and (min-width: 768px) {
         .container {
           width: 90%;
           padding: 0 10px;
           box-sizing: border-box;
         }
+
         table {
           width: 100%;
         }
+
         .table-container {
           overflow-x: auto;
         }
@@ -82,11 +96,13 @@
         }
 
         table {
-          width: 100%; /* ensures table is not wider than its container */
+          width: 100%;
+          /* ensures table is not wider than its container */
         }
 
         .table-container {
-          overflow-x: auto; /* allows table to scroll on x-axis on small screens */
+          overflow-x: auto;
+          /* allows table to scroll on x-axis on small screens */
         }
       }
 
@@ -105,17 +121,6 @@
       .table-number {
         font-size: 1.5em;
         color: #000;
-      }
-
-      .names-container {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-      }
-
-      .player-name {
-        font-size: 1.5em;
-        color: #fff;
       }
 
       .frames {
@@ -149,12 +154,14 @@
       .frames .frames-won.left,
       .frames .frames-won.right {
         font-size: 2.5em;
-        flex-basis: 30%; /* Adjust the width as needed */
+        flex-basis: 30%;
+        /* Adjust the width as needed */
         font-weight: bold;
       }
 
       .frames .best-of {
-        flex-basis: 40%; /* Adjust the width as needed */
+        flex-basis: 40%;
+        /* Adjust the width as needed */
       }
 
       .best-of {
@@ -162,56 +169,85 @@
       }
 
       .scores {
-        background-color: #333; /* Dark grey background */
-        color: #fff; /* White text */
-        border-radius: 15px; /* Rounded corners */
-        margin: 0 auto; /* Center the scores section */
-        width: 70%; /* Width of the scores section */
-        padding-left: 10px; /* Padding around the content */
-        padding-right: 10px; /* Padding around the content */
-        font-weight: bold; /* Bold text for the label */
-        display: flex; /* Use flexbox for layout */
-        justify-content: space-around; /* Distribute space around items */
-        align-items: center; /* Align items vertically */
-        position: relative; /* Needed for absolute positioning of children */
+        background-color: #333;
+        /* Dark grey background */
+        color: #fff;
+        /* White text */
+        border-radius: 15px;
+        /* Rounded corners */
+        margin: 0 auto;
+        /* Center the scores section */
+        width: 70%;
+        /* Width of the scores section */
+        padding-left: 10px;
+        /* Padding around the content */
+        padding-right: 10px;
+        /* Padding around the content */
+        font-weight: bold;
+        /* Bold text for the label */
+        display: flex;
+        /* Use flexbox for layout */
+        justify-content: space-around;
+        /* Distribute space around items */
+        align-items: center;
+        /* Align items vertically */
+        position: relative;
+        /* Needed for absolute positioning of children */
       }
 
       .scores .label {
-        position: absolute; /* Position label absolutely to center */
-        left: 0; /* Align to the left edge */
-        right: 0; /* Align to the right edge */
-        text-align: center; /* Center text horizontally */
-        color: #c1c1c1; /* White text color */
-        font-size: 0.8rem; /* Font size for the label */
-        top: 50%; /* Position halfway down the parent */
-        transform: translateY(
-          -50%
-        ); /* Offset by half the element's height to truly center */
+        position: absolute;
+        /* Position label absolutely to center */
+        left: 0;
+        /* Align to the left edge */
+        right: 0;
+        /* Align to the right edge */
+        text-align: center;
+        /* Center text horizontally */
+        color: #c1c1c1;
+        /* White text color */
+        font-size: 0.8rem;
+        /* Font size for the label */
+        top: 50%;
+        /* Position halfway down the parent */
+        transform: translateY(-50%);
+        /* Offset by half the element's height to truly center */
       }
 
       .scores .points {
-        font-size: 3.5em; /* Large font size for the points */
-        margin: 0 5%; /* Margin on the sides */
+        font-size: 3.5em;
+        /* Large font size for the points */
+        margin: 0 5%;
+        /* Margin on the sides */
       }
 
       /* Media query for responsive layout adjustments */
       @media (max-width: 768px) {
         .scores {
-          flex-direction: column; /* Stack children vertically on small screens */
+          flex-direction: column;
+          /* Stack children vertically on small screens */
         }
 
         .scores .label {
-          position: relative; /* Position label relatively */
-          top: auto; /* Reset top position */
-          transform: none; /* Reset transform */
-          padding-bottom: 10px; /* Space below the label */
+          position: relative;
+          /* Position label relatively */
+          top: auto;
+          /* Reset top position */
+          transform: none;
+          /* Reset transform */
+          padding-bottom: 10px;
+          /* Space below the label */
         }
 
         .scores .points {
-          width: 100%; /* Full width for points on small screens */
-          padding: 5px 0; /* Padding above and below points */
-          margin: 0; /* Reset margins */
-          order: -1; /* Place the label above the points */
+          width: 100%;
+          /* Full width for points on small screens */
+          padding: 5px 0;
+          /* Padding above and below points */
+          margin: 0;
+          /* Reset margins */
+          order: -1;
+          /* Place the label above the points */
         }
       }
 
@@ -242,23 +278,58 @@
         text-align: right;
       }
 
-      /* Add styles for player name alignment */
-      .player-name.left {
-        float: left;
-        text-align: center;
-        width: 50%;
+      .names-container {
+        display: flex;
+        justify-content: space-between; /* Ensures that there is space between the two player components */
+        padding: 0 5%; /* Adds padding to the left and right inside the container */
       }
 
-      .player-name.right {
-        float: right;
-        text-align: center;
-        width: 50%;
+      .player-component {
+        display: flex;
+        align-items: center; /* Aligns items vertically */
+        width: 45%; /* Player component takes up 45% width */
+      }
+
+      .player-component.right {
+        justify-content: flex-end; /* Aligns content to the end (right) for player 2 */
+      }
+
+      .player-photo {
+        height: 1.5em; /* Adjust the height as needed */
+        width: 1.5em; /* Adjust the width as needed, this could be larger than the font-size of the name */
+        object-fit: cover;
+        border-radius: 50%;
+      }
+
+      .player-photo.right {
+        margin-right: 0;
+        margin-left: 10px; /* Space between name and photo for right player component */
+      }
+
+      .player-name {
+        font-size: 1.5em;
+        color: #fff;
+        white-space: nowrap; /* Prevents the name from wrapping and ensures it's on the same row */
+      }
+
+      /* Adjust the left and right components' margins */
+      .player-component.left .player-photo {
+        margin-right: 10px; /* Space between photo and name for left component */
+      }
+
+      .player-component.right .player-photo {
+        margin-left: 10px; /* Space between name and photo for right component */
+      }
+
+      .player-component.right .player-name {
+        margin-right: 10px; /* Aligns the spacing to be consistent with the left */
       }
 
       /* Base styles for large screens */
       .scoreboard-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 columns */
         grid-gap: 20px;
         padding: 20px 0;
       }
@@ -266,14 +337,16 @@
       /* Styles for medium screens (e.g., tablets) */
       @media screen and (max-width: 1024px) {
         .scoreboard-grid {
-          grid-template-columns: repeat(2, 1fr); /* 2 columns */
+          grid-template-columns: repeat(2, 1fr);
+          /* 2 columns */
         }
       }
 
       /* Styles for small screens (e.g., mobile phones) */
       @media screen and (max-width: 768px) {
         .scoreboard-grid {
-          grid-template-columns: 1fr; /* 1 column */
+          grid-template-columns: 1fr;
+          /* 1 column */
           padding: 10px 0;
         }
       }
@@ -281,14 +354,16 @@
       .grid-item {
         background: #333;
         padding: 10px;
-        border-radius: 10px; /* Optional: Adds rounded corners to the cards */
+        border-radius: 10px;
+        /* Optional: Adds rounded corners to the cards */
       }
 
       .grid-item-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px; /* Spacing between header and scoreboard */
+        margin-bottom: 10px;
+        /* Spacing between header and scoreboard */
       }
 
       .table-number {
@@ -298,7 +373,8 @@
 
       .expand-icon {
         cursor: pointer;
-        font-size: 1.5em; /* Adjust icon size as needed */
+        font-size: 1.5em;
+        /* Adjust icon size as needed */
         color: #fff;
       }
 
@@ -359,8 +435,10 @@
       }
 
       .no-match {
-        opacity: 0.3; /* Lowered opacity for non-live matches */
-        position: relative; /* Needed for the absolute positioning of the message */
+        opacity: 0.3;
+        /* Lowered opacity for non-live matches */
+        position: relative;
+        /* Needed for the absolute positioning of the message */
       }
 
       .no-match-message {
@@ -372,10 +450,12 @@
         color: #fff;
         padding: 10px;
         border-radius: 5px;
-        z-index: 2; /* Ensure the message is above other content */
+        z-index: 2;
+        /* Ensure the message is above other content */
       }
     </style>
   </head>
+
   <body>
     <div class="container">
       <div class="header">
@@ -577,9 +657,9 @@
           data.forEach((player) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                        <td>${player.name}</td>
-                        <td>${player.highbreaks.join(", ")}</td>
-                    `;
+                          <td>${player.name}</td>
+                          <td>${player.highbreaks.join(", ")}</td>
+                      `;
             tableBody.appendChild(row);
           });
         }
@@ -625,6 +705,7 @@
       }
 
       function formatName(fullName) {
+        if (!fullName) return "Player Name";
         let deviceWidth =
           window.innerWidth > 0 ? window.innerWidth : screen.width;
         let nameLength = fullName.length;
@@ -641,6 +722,17 @@
         } else if (deviceWidth <= 425) {
           return concatName(fullName, 6);
         }
+      }
+
+      function getPlayerImage(name, size = "small") {
+        if (name === "default") {
+          return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png";
+        }
+        const playerNameTokens = name.split(" ");
+        if (size === "large") {
+          return `https://roundrobin.ch/PYRAMIDE/SPIELER/FOTO-GROSS/${playerNameTokens[0]}%20${playerNameTokens[1]}.jpg`;
+        }
+        return `https://roundrobin.ch/PYRAMIDE/SPIELER/${playerNameTokens[0]}%20${playerNameTokens[1]}.jpg`;
       }
 
       async function createScoreboardGrid() {
@@ -663,69 +755,71 @@
           const isMatchLiveOnTableNow = match !== undefined;
 
           gridContainer.innerHTML += `
-      <div class="grid-item ${isMatchLiveOnTableNow ? "" : "no-match"}">
-        <div class="grid-item-header">
-          <span class="table-number">Table ${i}</span>
-          <span class="expand-icon">⤢</span>
-        </div>
-        ${
-          !isMatchLiveOnTableNow
-            ? '<div class="no-match-message">No match live</div>'
-            : ""
-        }
-        <!-- Snooker Scoreboard Component -->
-        <div class="scoreboard">
-          <div class="names-container">
-            <div class="player-name left">${
-              isMatchLiveOnTableNow
-                ? formatName(match.player1Name)
-                : "Player One"
-            }</div>
-            <div class="player-name right">${
-              isMatchLiveOnTableNow
-                ? formatName(match.player2Name)
-                : "Player Two"
-            }</div>
+        <div class="grid-item ${isMatchLiveOnTableNow ? "" : "no-match"}">
+          <div class="grid-item-header">
+            <span class="table-number">Table ${i}</span>
+            <span class="expand-icon">⤢</span>
           </div>
-          <div class="frames">
-            <div class="frames-label">Frames</div>
-            <div class="frames-content">
-              <div class="frames-won left">${
-                isMatchLiveOnTableNow ? match.framesPlayer1 : 0
+          ${
+            !isMatchLiveOnTableNow
+              ? '<div class="no-match-message">No match live</div>'
+              : ""
+          }
+          <!-- Snooker Scoreboard Component -->
+          <div class="scoreboard">
+          <div class="names-container">
+            <div class="player-component left">
+    <img class="player-photo" src="${getPlayerImage(
+      match?.player1Name || "default"
+    )}" alt="Player One Photo">
+    <div class="player-name">${formatName(match?.player1Name)}</div>
+  </div>
+  <div class="player-component right">
+    <div class="player-name">${formatName(match?.player2Name)}</div>
+    <img class="player-photo" src="${getPlayerImage(
+      match?.player2Name || "default"
+    )}" alt="Player Two Photo">
+  </div>
+        </div>
+            <div class="frames">
+              <div class="frames-label">Frames</div>
+              <div class="frames-content">
+                <div class="frames-won left">${
+                  isMatchLiveOnTableNow ? match.framesPlayer1 : 0
+                }</div>
+                <div class="best-of">${
+                  isMatchLiveOnTableNow ? `(${match.bestOf})` : "(0)"
+                }</div>
+                <div class="frames-won right">${
+                  isMatchLiveOnTableNow ? match.framesPlayer2 : 0
+                }</div>
+              </div>
+            </div>
+            <div class="scores">
+              <div class="label">Score</div>
+              <div class="points left">${
+                isMatchLiveOnTableNow
+                  ? JSON.parse(match.rawGameLog).players[0].score || 0
+                  : 0
               }</div>
-              <div class="best-of">${
-                isMatchLiveOnTableNow ? `(${match.bestOf})` : "(0)"
+              <div class="points right">${
+                isMatchLiveOnTableNow
+                  ? JSON.parse(match.rawGameLog).players[1].score || 0
+                  : 0
               }</div>
-              <div class="frames-won right">${
-                isMatchLiveOnTableNow ? match.framesPlayer2 : 0
+            </div>
+            <div class="breaks">
+              <div class="breaks-list left">${
+                isMatchLiveOnTableNow ? match.breaksPlayer1.join(", ") : "0"
+              }</div>
+              <div class="breaks-label">Breaks</div>
+              <div class="breaks-list right">${
+                isMatchLiveOnTableNow ? match.breaksPlayer2.join(", ") : "0"
               }</div>
             </div>
           </div>
-          <div class="scores">
-            <div class="label">Score</div>
-            <div class="points left">${
-              isMatchLiveOnTableNow
-                ? JSON.parse(match.rawGameLog).players[0].score || 0
-                : 0
-            }</div>
-            <div class="points right">${
-              isMatchLiveOnTableNow
-                ? JSON.parse(match.rawGameLog).players[1].score || 0
-                : 0
-            }</div>
-          </div>
-          <div class="breaks">
-            <div class="breaks-list left">${
-              isMatchLiveOnTableNow ? match.breaksPlayer1.join(", ") : "0"
-            }</div>
-            <div class="breaks-label">Breaks</div>
-            <div class="breaks-list right">${
-              isMatchLiveOnTableNow ? match.breaksPlayer2.join(", ") : "0"
-            }</div>
-          </div>
         </div>
-      </div>
-    `;
+      `;
         }
       }
 
