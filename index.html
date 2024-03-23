@@ -302,7 +302,7 @@
         height: 1.5em; /* Adjust the height as needed */
         width: 1.5em; /* Adjust the width as needed, this could be larger than the font-size of the name */
         object-fit: cover;
-        /* border-radius: 50%; */
+        border-radius: 50%;
       }
 
       .player-photo.right {
@@ -846,14 +846,6 @@
       }
 
       function getPlayerImage(name, size = "small") {
-        // randomly return one of two urls
-        return Math.random() > 0.5
-          ? "https://roundrobin.ch/SCOREBOARD/Flags-IOC/128/SUI.gif"
-          : Math.random() > 0.5
-          ? "https://roundrobin.ch/SCOREBOARD/Flags-IOC/128/RSA.gif"
-          : Math.random() > 0.5
-          ? "https://roundrobin.ch/SCOREBOARD/Flags-IOC/128/ENG.gif"
-          : "https://roundrobin.ch/SCOREBOARD/Flags-IOC/128/WAL.gif"; // TODO: remove
         if (name === "default") {
           return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png";
         }
