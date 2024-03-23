@@ -291,7 +291,8 @@
       .player-component {
         display: flex;
         align-items: center; /* Aligns items vertically */
-        width: 45%; /* Player component takes up 45% width */
+        /* width: 45%; Player component takes up 45% width */
+        justify-content: center; /* Centers the children within the component */
       }
 
       .player-component.right {
@@ -302,6 +303,7 @@
         height: 1.5em; /* Adjust the height as needed */
         width: 1.5em; /* Adjust the width as needed, this could be larger than the font-size of the name */
         object-fit: cover;
+        margin: 0 10px; /* Adds margin to both sides for consistent spacing */
         /* border-radius: 50%; */
       }
 
@@ -314,6 +316,7 @@
         font-size: 1.5em;
         color: #fff;
         white-space: nowrap; /* Prevents the name from wrapping and ensures it's on the same row */
+        margin: 0 10px; /* Adds margin to both sides for consistent spacing */
       }
 
       /* Adjust the left and right components' margins */
