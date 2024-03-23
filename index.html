@@ -302,7 +302,7 @@
         height: 1.5em; /* Adjust the height as needed */
         width: 1.5em; /* Adjust the width as needed, this could be larger than the font-size of the name */
         object-fit: cover;
-        border-radius: 50%;
+        /* border-radius: 50%; */
       }
 
       .player-photo.right {
@@ -846,6 +846,14 @@
       }
 
       function getPlayerImage(name, size = "small") {
+        // randomly return one of two urls
+        return Math.random() > 0.5
+          ? "https://roundrobin.ch/SCOREBOARD/Flags-IOC/SVG/4x3/SUI.svg"
+          : Math.random() > 0.5
+          ? "https://roundrobin.ch/SCOREBOARD/Flags-IOC/SVG/4x3/RSA.svg"
+          : Math.random() > 0.5
+          ? "https://roundrobin.ch/SCOREBOARD/Flags-IOC/SVG/4x3/GBR.svg"
+          : "https://roundrobin.ch/SCOREBOARD/Flags-IOC/SVG/4x3/WAL.svg"; // TODO: remove
         if (name === "default") {
           return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png";
         }
@@ -861,6 +869,7 @@
         try {
           const response = await fetch(
             "https://rrsb-scoreboard-server.onrender.com/api/matches/live"
+            // "http://localhost:3000/api/matches/live"
           );
           const data = await response.json();
           matches = data.data || [];
