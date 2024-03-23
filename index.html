@@ -889,10 +889,10 @@
             <span class="expand-icon">⤢</span>
           </div>
           ${
-            match !== undefined
-              ? matchUpdatedAt > oneHourAgo
-                ? '<div class="no-match-message">No match live</div>'
-                : '<div class="no-match-message">Match over/paused</div>'
+            match === undefined
+              ? '<div class="no-match-message">No match found</div>'
+              : matchUpdatedAt < oneHourAgo
+              ? '<div class="no-match-message">Match over/paused</div>'
               : ""
           }
           <!-- Snooker Scoreboard Component -->
