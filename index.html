@@ -994,8 +994,8 @@
           const actionTime = match?.winner
             ? match?.updatedAt
             : matchUpdatedAt > oneHourAgo
-            ? match?.updatedAt
-            : match?.createdAt;
+            ? match?.createdAt
+            : match?.updatedAt;
           const actionLabel = match?.winner
             ? "Ended: "
             : matchUpdatedAt > oneHourAgo
