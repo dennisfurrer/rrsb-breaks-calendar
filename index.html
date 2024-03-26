@@ -140,21 +140,25 @@
       /* Keep the table number and actions (expand icon) sections smaller than the timestamp */
       .table-number-section,
       .actions-section {
-        flex: 0 0 30%; /* do not grow, do not shrink, start at 20% of the parent width */
+        flex: 0 0 30%;
+        /* do not grow, do not shrink, start at 20% of the parent width */
         /* remove left and right margins */
         margin: 0;
       }
 
       /* Allow the timestamp section to grow and fill the space */
       .timestamp-section {
-        flex: 0 1 40%; /* do not grow, allow shrink, start at 60% of the parent width */
-        font-size: 0.8em; /* adjust as needed */
+        flex: 0 1 40%;
+        /* do not grow, allow shrink, start at 60% of the parent width */
+        font-size: 0.9em;
+        /* adjust as needed */
       }
 
       /* Responsive adjustments for smaller screens */
       @media (max-width: 768px) {
         .timestamp-section {
-          font-size: 0.7em; /* adjust font size on smaller screens */
+          font-size: 0.7em;
+          /* adjust font size on smaller screens */
         }
       }
 
@@ -429,6 +433,10 @@
         color: #fff;
       }
 
+      .last-action {
+        color: #fff;
+      }
+
       .expand-icon {
         cursor: pointer;
         font-size: 1.5em;
@@ -564,6 +572,18 @@
         /* Scale from the center top */
         margin: 0 auto;
         /* Center it horizontally */
+      }
+
+      .gold-text {
+        color: gold;
+      }
+
+      .red-text {
+        color: red;
+      }
+
+      .green-text {
+        color: green;
       }
     </style>
     <link rel=”shortcut icon” type=”image/png” href=”favicon.png” />
@@ -825,9 +845,9 @@
           data.forEach((player) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                          <td>${player.name}</td>
-                          <td>${player.highbreaks.join(", ")}</td>
-                      `;
+                                    <td>${player.name}</td>
+                                    <td>${player.highbreaks.join(", ")}</td>
+                                `;
             tableBody.appendChild(row);
           });
         }
@@ -979,80 +999,92 @@
           const actionLabel = match?.winner
             ? "Ended: "
             : matchUpdatedAt > oneHourAgo
-            ? "Last action: "
-            : "Started: ";
+            ? "Started: "
+            : "Last action: ";
           const formattedTime = formatDate(actionTime);
           const lastActionLabel = actionLabel + formattedTime;
 
           gridContainer.innerHTML += `
-        <div class="grid-item ${isMatchLiveOnTableNow ? "" : "no-match"}">
-          <div class="grid-item-header">
-      <div class="table-number-section">
-        <span class="table-number">Table ${i}</span>
-      </div>
-      <div class="timestamp-section">
-        <span class="last-action" style="font-style:italic">${lastActionLabel}</span>
-      </div>
-      <div class="actions-section">
-        <span class="expand-icon">⤢</span>
-      </div>
-    </div>
-          ${
-            match === undefined
-              ? '<div class="no-match-message">No match found</div>'
-              : matchUpdatedAt < oneHourAgo
-              ? '<div class="no-match-message">Match over/paused</div>'
-              : ""
-          }
-          <!-- Snooker Scoreboard Component -->
-          <div class="scoreboard">
-          <div class="names-container">
-            <div class="player-component left">
-    <img class="player-photo" src="${getPlayerImage(
-      match?.player1NationIOC || "default"
-    )}" alt="Player One Photo">
-    <div class="player-name">${formatName(match?.player1Name)}</div>
-  </div>
-  <div class="player-component right">
-    <div class="player-name">${formatName(match?.player2Name)}</div>
-    <img class="player-photo" src="${getPlayerImage(
-      match?.player2NationIOC || "default"
-    )}" alt="Player Two Photo">
-  </div>
-        </div>
-            <div class="frames">
-              <div class="frames-label">Frames</div>
-              <div class="frames-content">
-                <div class="frames-won left">${match?.framesPlayer1 || 0}</div>
-                <div class="best-of">${match?.bestOf || 0}</div>
-                <div class="frames-won right">${match?.framesPlayer2 || 0}</div>
+                  <div class="grid-item ${
+                    isMatchLiveOnTableNow ? "" : "no-match"
+                  }">
+                    <div class="grid-item-header">
+                <div class="table-number-section">
+                  <span class="table-number" style="float:left;padding-left:20px;">Table ${i}</span>
+                </div>
+                <div class="timestamp-section" id="timestamp-section">
+                  <span class="last-action" style="font-style:italic;color:${
+                    match?.winner
+                      ? `#3ec1d5`
+                      : matchUpdatedAt < oneHourAgo
+                      ? `#FF4F4B`
+                      : `#00E600`
+                  }">${lastActionLabel}</span>
+                </div>
+                <div class="actions-section">
+                  <span class="expand-icon" style="float:right;padding-right:20px;">⤢</span>
+                </div>
               </div>
+                    ${
+                      match === undefined
+                        ? '<div class="no-match-message">No match found</div>'
+                        : matchUpdatedAt < oneHourAgo
+                        ? '<div class="no-match-message">Match over/paused</div>'
+                        : ""
+                    }
+                    <!-- Snooker Scoreboard Component -->
+                    <div class="scoreboard">
+                    <div class="names-container">
+                      <div class="player-component left">
+              <img class="player-photo" src="${getPlayerImage(
+                match?.player1NationIOC || "default"
+              )}" alt="Player One Photo">
+              <div class="player-name">${formatName(match?.player1Name)}</div>
             </div>
-            <div class="scores">
-              <div class="label">Score</div>
-              <div class="points left">${
-                JSON.parse(match?.rawGameLog)?.players[0]?.score || 0
-              }</div>
-              <div class="points right">${
-                JSON.parse(match?.rawGameLog)?.players[1]?.score || 0
-              }</div>
+            <div class="player-component right">
+              <div class="player-name">${formatName(match?.player2Name)}</div>
+              <img class="player-photo" src="${getPlayerImage(
+                match?.player2NationIOC || "default"
+              )}" alt="Player Two Photo">
             </div>
-            <div class="breaks">
-        <div class="breaks-list left">${
-          limitBreaks
-            ? match.breaksPlayer1.slice(0, 3).join(", ") || "0"
-            : match.breaksPlayer1.slice(0, 5).join(", ") || "0" || "0"
-        }</div>
-        <div class="breaks-label">Breaks</div>
-        <div class="breaks-list right">${
-          limitBreaks
-            ? match.breaksPlayer2.slice(0, 3).join(", ") || "0"
-            : match.breaksPlayer2.slice(0, 5).join(", ") || "0" || "0"
-        }</div>
-      </div>
-          </div>
-        </div>
-      `;
+                  </div>
+                      <div class="frames">
+                        <div class="frames-label">Frames</div>
+                        <div class="frames-content">
+                          <div class="frames-won left">${
+                            match?.framesPlayer1 || 0
+                          }</div>
+                          <div class="best-of">${match?.bestOf || 0}</div>
+                          <div class="frames-won right">${
+                            match?.framesPlayer2 || 0
+                          }</div>
+                        </div>
+                      </div>
+                      <div class="scores">
+                        <div class="label">Score</div>
+                        <div class="points left">${
+                          JSON.parse(match?.rawGameLog)?.players[0]?.score || 0
+                        }</div>
+                        <div class="points right">${
+                          JSON.parse(match?.rawGameLog)?.players[1]?.score || 0
+                        }</div>
+                      </div>
+                      <div class="breaks">
+                  <div class="breaks-list left">${
+                    limitBreaks
+                      ? match.breaksPlayer1.slice(0, 3).join(", ") || "0"
+                      : match.breaksPlayer1.slice(0, 5).join(", ") || "0" || "0"
+                  }</div>
+                  <div class="breaks-label">Breaks</div>
+                  <div class="breaks-list right">${
+                    limitBreaks
+                      ? match.breaksPlayer2.slice(0, 3).join(", ") || "0"
+                      : match.breaksPlayer2.slice(0, 5).join(", ") || "0" || "0"
+                  }</div>
+                </div>
+                    </div>
+                  </div>
+                `;
         }
       }
 
