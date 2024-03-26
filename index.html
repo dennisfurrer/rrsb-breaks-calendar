@@ -123,6 +123,42 @@
         color: #000;
       }
 
+      .grid-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      /* Set the flex-basis for each section */
+      .table-number-section,
+      .timestamp-section,
+      .actions-section {
+        flex: 1;
+        text-align: center;
+      }
+
+      /* Keep the table number and actions (expand icon) sections smaller than the timestamp */
+      .table-number-section,
+      .actions-section {
+        flex: 0 0 30%; /* do not grow, do not shrink, start at 20% of the parent width */
+        /* remove left and right margins */
+        margin: 0;
+      }
+
+      /* Allow the timestamp section to grow and fill the space */
+      .timestamp-section {
+        flex: 0 1 40%; /* do not grow, allow shrink, start at 60% of the parent width */
+        font-size: 0.8em; /* adjust as needed */
+      }
+
+      /* Responsive adjustments for smaller screens */
+      @media (max-width: 768px) {
+        .timestamp-section {
+          font-size: 0.7em; /* adjust font size on smaller screens */
+        }
+      }
+
       .frames {
         background-color: orange;
         border-radius: 15px;
@@ -193,7 +229,8 @@
         /* Align items vertically */
         position: relative;
         /* Needed for absolute positioning of children */
-        flex-wrap: nowrap; /* This prevents flex items from wrapping */
+        flex-wrap: nowrap;
+        /* This prevents flex items from wrapping */
       }
 
       .scores .label {
@@ -225,17 +262,22 @@
       /* Media query for responsive layout adjustments */
       @media (max-width: 768px) {
         .scores {
-          flex-direction: row; /* Keep the row direction even on small screens */
-          justify-content: space-between; /* Distribute space around items */
-          padding: 10px 20px; /* Adjust padding as needed */
+          flex-direction: row;
+          /* Keep the row direction even on small screens */
+          justify-content: space-between;
+          /* Distribute space around items */
+          padding: 10px 20px;
+          /* Adjust padding as needed */
         }
 
         .scores .label {
-          display: none; /* Hide the label to save space */
+          display: none;
+          /* Hide the label to save space */
         }
 
         .scores .points {
-          font-size: 2em; /* Adjust font size for small screens */
+          font-size: 2em;
+          /* Adjust font size for small screens */
           /* Reset other styles that might cause layout issues */
           padding: 0;
           margin: 0;
@@ -245,7 +287,8 @@
       }
 
       .breaks {
-        position: relative; /* Add this line */
+        position: relative;
+        /* Add this line */
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -258,7 +301,8 @@
         display: flex;
         list-style-type: none;
         padding: 0;
-        margin: 0; /* Removes default margin */
+        margin: 0;
+        /* Removes default margin */
         gap: 8px;
       }
 
@@ -266,7 +310,8 @@
         position: absolute;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%); /* Combine both transforms */
+        transform: translate(-50%, -50%);
+        /* Combine both transforms */
         color: #5bb5ff;
         font-size: 1rem;
         z-index: 1;
@@ -282,55 +327,69 @@
 
       .names-container {
         display: flex;
-        justify-content: space-between; /* Ensures that there is space between the two player components */
-        padding: 0 5%; /* Adds padding to the left and right inside the container */
+        justify-content: space-between;
+        /* Ensures that there is space between the two player components */
+        padding: 0 5%;
+        /* Adds padding to the left and right inside the container */
         padding-top: 10px;
         padding-bottom: 10px;
       }
 
       .player-component {
         display: flex;
-        align-items: center; /* Aligns items vertically */
+        align-items: center;
+        /* Aligns items vertically */
         /* width: 45%; Player component takes up 45% width */
-        justify-content: center; /* Centers the children within the component */
+        justify-content: center;
+        /* Centers the children within the component */
       }
 
       .player-component.right {
-        justify-content: flex-end; /* Aligns content to the end (right) for player 2 */
+        justify-content: flex-end;
+        /* Aligns content to the end (right) for player 2 */
       }
 
       .player-photo {
-        height: 1.5em; /* Adjust the height as needed */
-        width: 2em; /* Adjust the width as needed, this could be larger than the font-size of the name */
+        height: 1.5em;
+        /* Adjust the height as needed */
+        width: 2em;
+        /* Adjust the width as needed, this could be larger than the font-size of the name */
         object-fit: cover;
-        margin: 0 10px; /* Adds margin to both sides for consistent spacing */
+        margin: 0 10px;
+        /* Adds margin to both sides for consistent spacing */
         opacity: 0.8;
         /* border-radius: 50%; */
       }
 
       .player-photo.right {
         margin-right: 0;
-        margin-left: 10px; /* Space between name and photo for right player component */
+        margin-left: 10px;
+        /* Space between name and photo for right player component */
       }
 
       .player-name {
         font-size: 1.5em;
         color: #fff;
-        white-space: nowrap; /* Prevents the name from wrapping and ensures it's on the same row */
-        margin: 0 10px; /* Adds margin to both sides for consistent spacing */
+        white-space: nowrap;
+        /* Prevents the name from wrapping and ensures it's on the same row */
+        margin: 0 10px;
+        /* Adds margin to both sides for consistent spacing */
       }
 
       /* Adjust the left and right components' margins */
       .player-component.left .player-photo {
-        margin-right: 10px; /* Space between photo and name for left component */
+        margin-right: 10px;
+        /* Space between photo and name for left component */
       }
 
       .player-component.right .player-photo {
-        margin-left: 10px; /* Space between name and photo for right component */
+        margin-left: 10px;
+        /* Space between name and photo for right component */
       }
 
       .player-component.right .player-name {
-        margin-right: 10px; /* Aligns the spacing to be consistent with the left */
+        margin-right: 10px;
+        /* Aligns the spacing to be consistent with the left */
       }
 
       /* Base styles for large screens */
@@ -364,14 +423,6 @@
         padding: 10px;
         border-radius: 10px;
         /* Optional: Adds rounded corners to the cards */
-      }
-
-      .grid-item-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        /* Spacing between header and scoreboard */
       }
 
       .table-number {
@@ -464,23 +515,28 @@
 
       /* Modal styles */
       .modal {
-        display: none; /* Hidden by default */
+        display: none;
+        /* Hidden by default */
         position: fixed;
         z-index: 10;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+        overflow: auto;
+        /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.4);
+        /* Black with opacity */
       }
 
       .modal-content {
         background-color: #fefefe;
-        margin: 15% auto; /* 15% from the top and centered */
+        margin: 15% auto;
+        /* 15% from the top and centered */
         padding: 20px;
         border: 1px solid #888;
-        width: 80%; /* Could be more or less, depending on screen size */
+        width: 80%;
+        /* Could be more or less, depending on screen size */
         transform: translate(-50%, -50%);
         position: relative;
         top: 50%;
@@ -503,12 +559,15 @@
 
       /* Enlarged scoreboard styles */
       .scoreboard-enlarged {
-        transform: scale(4); /* Enlarge 4 times */
-        transform-origin: center top; /* Scale from the center top */
-        margin: 0 auto; /* Center it horizontally */
+        transform: scale(4);
+        /* Enlarge 4 times */
+        transform-origin: center top;
+        /* Scale from the center top */
+        margin: 0 auto;
+        /* Center it horizontally */
       }
     </style>
-    <link rel=”shortcut icon” type=”image/png” href=”favicon.png”/>
+    <link rel=”shortcut icon” type=”image/png” href=”favicon.png” />
   </head>
 
   <body>
@@ -822,15 +881,15 @@
         if (deviceWidth > 1900) {
           return concatName(fullName, 15);
         } else if (deviceWidth <= 1900 && deviceWidth > 1600) {
-          return concatName(fullName, 9);
+          return concatName(fullName, 8);
         } else if (deviceWidth <= 1600 && deviceWidth > 1500) {
-          return concatName(fullName, 9);
-        } else if (deviceWidth <= 1500 && deviceWidth > 1200) {
           return concatName(fullName, 6);
-        } else if (deviceWidth <= 1200 && deviceWidth > 1100) {
-          return concatName(fullName, 5);
-        } else if (deviceWidth <= 1100 && deviceWidth > 1024) {
+        } else if (deviceWidth <= 1500 && deviceWidth > 1200) {
           return concatName(fullName, 4);
+        } else if (deviceWidth <= 1200 && deviceWidth > 1150) {
+          return concatName(fullName, 3);
+        } else if (deviceWidth <= 1150 && deviceWidth > 1024) {
+          return concatName(fullName, 2);
         } else if (deviceWidth <= 1024 && deviceWidth > 896) {
           return concatName(fullName, 7);
         } else if (deviceWidth <= 896 && deviceWidth > 820) {
@@ -848,6 +907,36 @@
         } else if (deviceWidth <= 400) {
           return concatName(fullName, 3);
         }
+      }
+
+      function formatDate(date) {
+        const now = new Date();
+        const matchDate = new Date(date);
+        const twentyFourHoursAgo = new Date(
+          now.getTime() - 24 * 60 * 60 * 1000
+        );
+
+        let dateString;
+
+        if (matchDate < twentyFourHoursAgo) {
+          dateString =
+            matchDate.toISOString().slice(8, 10) +
+            "/" +
+            matchDate.toISOString().slice(5, 7) +
+            "/" +
+            matchDate.toISOString().slice(2, 4);
+        } else {
+          // Format time for recent dates
+          let hours = matchDate.getHours();
+          let minutes = matchDate.getMinutes();
+          // Pad single digit minutes with leading zero
+          minutes = minutes < 10 ? `0${minutes}` : minutes;
+          // Convert "24" to "00"
+          hours = hours === 0 ? "00" : hours < 10 ? `0${hours}` : hours;
+          dateString = `${hours}:${minutes}`;
+        }
+
+        return dateString;
       }
 
       function getPlayerImage(playerNationIOC) {
@@ -883,13 +972,32 @@
           const matchUpdatedAt = new Date(match?.updatedAt);
           const isMatchLiveOnTableNow =
             match !== undefined && matchUpdatedAt > oneHourAgo;
+          const actionTime = match?.winner
+            ? match?.updatedAt
+            : matchUpdatedAt > oneHourAgo
+            ? match?.updatedAt
+            : match?.createdAt;
+          const actionLabel = match?.winner
+            ? "Ended: "
+            : matchUpdatedAt > oneHourAgo
+            ? "Last action: "
+            : "Started: ";
+          const formattedTime = formatDate(actionTime);
+          const lastActionLabel = actionLabel + formattedTime;
 
           gridContainer.innerHTML += `
         <div class="grid-item ${isMatchLiveOnTableNow ? "" : "no-match"}">
           <div class="grid-item-header">
-            <span class="table-number">Table ${i}</span>
-            <span class="expand-icon">⤢</span>
-          </div>
+      <div class="table-number-section">
+        <span class="table-number">Table ${i}</span>
+      </div>
+      <div class="timestamp-section">
+        <span class="last-action">${lastActionLabel}</span>
+      </div>
+      <div class="actions-section">
+        <span class="expand-icon">⤢</span>
+      </div>
+    </div>
           ${
             match === undefined
               ? '<div class="no-match-message">No match found</div>'
