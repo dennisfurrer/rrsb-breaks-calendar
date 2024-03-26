@@ -110,7 +110,7 @@
       .scoreboard {
         /* max-height: 200px; Or whatever height is appropriate for your content */
         font-family: "Arial", sans-serif;
-        margin-top: 20px;
+        margin-top: 10px;
         text-align: center;
         background-color: #000;
         box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px,
@@ -127,7 +127,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
       }
 
       /* Set the flex-basis for each section */
@@ -992,7 +991,7 @@
         <span class="table-number">Table ${i}</span>
       </div>
       <div class="timestamp-section">
-        <span class="last-action">${lastActionLabel}</span>
+        <span class="last-action" style="font-style:italic">${lastActionLabel}</span>
       </div>
       <div class="actions-section">
         <span class="expand-icon">⤢</span>
