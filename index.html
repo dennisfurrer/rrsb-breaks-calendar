@@ -1029,7 +1029,9 @@
                       match === undefined
                         ? '<div class="no-match-message">No match found</div>'
                         : matchUpdatedAt < oneHourAgo
-                        ? '<div class="no-match-message">Match over/paused</div>'
+                        ? match?.winner
+                          ? '<div class="no-match-message">Match ended</div>'
+                          : '<div class="no-match-message">Match paused</div>'
                         : ""
                     }
                     <!-- Snooker Scoreboard Component -->
