@@ -603,6 +603,87 @@
       .green-text {
         color: green;
       }
+
+      /* Player Profile Page Styling Improvements */
+      .profile-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: var(--table-header-bg-color);
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .player-details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .player-details img {
+        margin-right: 20px;
+        margin-bottom: 20px;
+      }
+
+      .player-details h1 {
+        margin-bottom: 5px;
+        font-size: 2em;
+        color: var(--text-color);
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        background: var(--background-color);
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-card h2 {
+        font-size: 1em;
+        color: var(--text-color);
+        margin: 10px 0;
+      }
+
+      .stat-card .stat-value {
+        font-size: 2em;
+        color: var(--text-color);
+        font-weight: bold;
+      }
+
+      .stat-card.full-width {
+        grid-column: 1 / -1; /* Make it span the full width */
+      }
+
+      /* Responsive adjustments for smaller screens */
+      @media (max-width: 768px) {
+        .profile-container {
+          padding: 10px;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      a {
+        color: inherit; /* This ensures the link color is the same as the parent text color */
+        text-decoration: none; /* Optional: removes the underline from links */
+      }
+
+      a:hover,
+      a:focus {
+        text-decoration: underline; /* Optional: adds underline on hover for better UX */
+      }
     </style>
     <link rel=”shortcut icon” type=”image/png” href=”favicon.png” />
   </head>
@@ -676,6 +757,12 @@
               <!-- Content will be dynamically copied from the clicked scoreboard -->
             </div>
           </div>
+        </div>
+      </div>
+      <!-- Player Profile Content -->
+      <div id="playerProfileContent" class="hidden">
+        <div class="profile-container">
+          <!-- Profile details will be dynamically inserted here -->
         </div>
       </div>
       <hr />
@@ -883,8 +970,12 @@
             row.innerHTML = `
                                     <td>${
                                       allTimeList
-                                        ? player.name
-                                        : player.playerName
+                                        ? `<a href="?tab=profile&name=${encodeURIComponent(
+                                            player.name
+                                          )}">${player.name}</a>`
+                                        : `<a href="?tab=profile&name=${encodeURIComponent(
+                                            player.playerName
+                                          )}">${player.playerName}</a>`
                                     }</td>
                                     <td>${player.highbreaks.join(", ")}</td>
                                 `;
@@ -907,6 +998,7 @@
         const tab = urlParams.get("tab");
         const table = urlParams.get("table"); // Get the table number from URL
         const pageTitleElement = document.getElementById("pageTitle");
+        const name = urlParams.get("name"); // Get the player's name from URL
 
         // Handling tab visibility
         if (tab === "livescores") {
@@ -918,10 +1010,115 @@
           if (table) {
             openModalForTable(table); // Open the modal for the specific table if parameter is present
           }
+        } else if (tab === "profile" && name) {
+          document.getElementById("breaksContent").classList.add("hidden");
+          document.getElementById("liveScoresContent").classList.add("hidden");
+          document
+            .getElementById("playerProfileContent")
+            .classList.remove("hidden");
+          pageTitleElement.textContent = "Player Profile";
+          loadPlayerProfile(name); // Load the player profile data
         } else {
           document.getElementById("breaksContent").classList.remove("hidden");
           document.getElementById("liveScoresContent").classList.add("hidden");
           pageTitleElement.textContent = "Daily Breaks";
+        }
+
+        // Function to load player profile data
+        async function loadPlayerProfile(playerName) {
+          // Fetch player data from the server or use local data
+          try {
+            const response = await fetch(
+              `https://rrsb-scoreboard-server.onrender.com/players/${playerName}`
+              // `http://localhost:3000/players/${playerName}`
+            );
+            const playerData = await response.json();
+            displayPlayerProfile(playerData.data);
+          } catch (error) {
+            console.error("Error fetching player data:", error);
+          }
+        }
+
+        // Function to display player profile data
+        function displayPlayerProfile(playerData) {
+          const profileContainer = document.querySelector(".profile-container");
+          profileContainer.innerHTML = ""; // Clear the container
+
+          const playerDetailDiv = document.createElement("div");
+          playerDetailDiv.classList.add("player-details");
+
+          // Player image
+          const playerImage = document.createElement("img");
+          playerImage.src = getPlayerImage(playerData.nationality);
+          playerImage.alt = "Player Nationality";
+          playerDetailDiv.appendChild(playerImage);
+
+          // Player name
+          const playerName = document.createElement("h1");
+          playerName.textContent = playerData.name;
+          playerDetailDiv.appendChild(playerName);
+
+          profileContainer.appendChild(playerDetailDiv);
+
+          // Create stats grid
+          const stats = document.createElement("div");
+          stats.classList.add("stats");
+
+          // Function to create stat card
+          function createStatCard(title, value) {
+            const statCard = document.createElement("div");
+            statCard.classList.add("stat-card");
+
+            const statTitle = document.createElement("h2");
+            statTitle.textContent = title;
+            statTitle.style.color = "#a1a1a1";
+            statCard.appendChild(statTitle);
+
+            const statValue = document.createElement("div");
+            statValue.classList.add("stat-value");
+            statValue.textContent = value;
+            statCard.appendChild(statValue);
+
+            return statCard;
+          }
+
+          // Add all stats except 'Highest Breaks' (which will be full width)
+          const statsExcludingHighBreaks = [
+            { title: "Matches Won", value: playerData.matchesWon },
+            { title: "Matches Lost", value: playerData.matchesLost },
+            {
+              title: "Match Win Rate (%)",
+              value:
+                Math.round(
+                  (playerData.matchesWon / playerData.matchesCompleted) * 100
+                ) + "%",
+            },
+            { title: "Frames Won", value: playerData.framesWon },
+            { title: "Frames Lost", value: playerData.framesLost },
+            {
+              title: "Frame Win Rate (%)",
+              value:
+                Math.round(
+                  (playerData.framesWon /
+                    (playerData.framesWon + playerData.framesLost)) *
+                    100
+                ) + "%",
+            },
+          ];
+
+          statsExcludingHighBreaks.forEach((stat) => {
+            stats.appendChild(createStatCard(stat.title, stat.value));
+          });
+
+          // High breaks stat (full width)
+          const highBreaksCard = createStatCard(
+            "Highest Breaks (Top 10)",
+            playerData.highBreaks.join(", ")
+          );
+          highBreaksCard.classList.add("full-width");
+          stats.appendChild(highBreaksCard);
+
+          profileContainer.appendChild(stats);
         }
       }
 
