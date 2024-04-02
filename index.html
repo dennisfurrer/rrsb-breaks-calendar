@@ -812,11 +812,11 @@
 
     <script>
       const videoCameraSVG = `
-  <svg class="video-camera-icon disabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M23 7l-7 5 7 5V7z"></path>
-    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-  </svg>
-`;
+        <svg class="video-camera-icon disabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 7l-7 5 7 5V7z"></path>
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+        </svg>
+      `;
 
       document.addEventListener("DOMContentLoaded", function () {
         const iconSun = document.getElementById("icon-sun");
@@ -968,17 +968,19 @@
           data.forEach((player) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                                    <td>${
-                                      allTimeList
-                                        ? `<a href="?tab=profile&name=${encodeURIComponent(
-                                            player.name
-                                          )}">${player.name}</a>`
-                                        : `<a href="?tab=profile&name=${encodeURIComponent(
-                                            player.playerName
-                                          )}">${player.playerName}</a>`
-                                    }</td>
-                                    <td>${player.highbreaks.join(", ")}</td>
-                                `;
+                                          <td>${
+                                            allTimeList
+                                              ? `<a href="?tab=profile&name=${encodeURIComponent(
+                                                  player.name
+                                                )}">${player.name}</a>`
+                                              : `<a href="?tab=profile&name=${encodeURIComponent(
+                                                  player.playerName
+                                                )}">${player.playerName}</a>`
+                                          }</td>
+                                          <td>${player.highbreaks.join(
+                                            ", "
+                                          )}</td>
+                                      `;
             tableBody.appendChild(row);
           });
         }
@@ -1104,6 +1106,14 @@
                     100
                 ) + "%",
             },
+            {
+              title: "Avg. High Break Per Match",
+              value: playerData.averageBreakPerMatch,
+            },
+            {
+              title: "Matches Not Finished",
+              value: playerData.incompleteMatches,
+            },
           ];
 
           statsExcludingHighBreaks.forEach((stat) => {
@@ -1112,7 +1122,7 @@
 
           // High breaks stat (full width)
           const highBreaksCard = createStatCard(
-            "Highest Breaks (Top 10)",
+            "High Breaks (Top 10)",
             playerData.highBreaks.join(", ")
           );
           highBreaksCard.classList.add("full-width");
@@ -1258,89 +1268,99 @@
           const lastActionLabel = actionLabel + formattedTime;
 
           gridContainer.innerHTML += `
-                  <div class="grid-item ${
-                    isMatchLiveOnTableNow ? "" : "no-match"
-                  }" data-table-number="${i}">
-                    <div class="grid-item-header">
-                <div class="table-number-section">
-                  <span class="table-number" style="float:left;padding-left:20px;">Table ${i}</span>
-                </div>
-                <div class="timestamp-section" id="timestamp-section">
-                  <span class="last-action" style="font-style:italic;color:${
-                    match?.winner
-                      ? `#3ec1d5`
-                      : matchUpdatedAt < oneHourAgo
-                      ? `#FF4F4B`
-                      : `#00E600`
-                  }">${lastActionLabel}</span>
-                </div>
-                <div class="actions-section">
-                  <!-- ${videoCameraSVG} // TODO: uncomment when ready -->
-                  <span class="expand-icon">⤢</span>
-                </div>
-              </div>
-                    ${
-                      match === undefined
-                        ? '<div class="no-match-message">No match found</div>'
-                        : matchUpdatedAt < oneHourAgo
-                        ? match?.winner
-                          ? '<div class="no-match-message">Match ended</div>'
-                          : '<div class="no-match-message">Match paused</div>'
-                        : ""
-                    }
-                    <!-- Snooker Scoreboard Component -->
-                    <div class="scoreboard">
-                    <div class="names-container">
-                      <div class="player-component left">
-              <img class="player-photo" src="${getPlayerImage(
-                match?.player1NationIOC || "default"
-              )}" alt="Player One Photo">
-              <div class="player-name">${formatName(match?.player1Name)}</div>
-            </div>
-            <div class="player-component right">
-              <div class="player-name">${formatName(match?.player2Name)}</div>
-              <img class="player-photo" src="${getPlayerImage(
-                match?.player2NationIOC || "default"
-              )}" alt="Player Two Photo">
-            </div>
-                  </div>
-                      <div class="frames">
-                        <div class="frames-label">Frames</div>
-                        <div class="frames-content">
-                          <div class="frames-won left">${
-                            match?.framesPlayer1 || 0
-                          }</div>
-                          <div class="best-of">${match?.bestOf || 0}</div>
-                          <div class="frames-won right">${
-                            match?.framesPlayer2 || 0
-                          }</div>
-                        </div>
+                        <div class="grid-item ${
+                          isMatchLiveOnTableNow ? "" : "no-match"
+                        }" data-table-number="${i}">
+                          <div class="grid-item-header">
+                      <div class="table-number-section">
+                        <span class="table-number" style="float:left;padding-left:20px;">Table ${i}</span>
                       </div>
-                      <div class="scores">
-                        <div class="label">Score</div>
-                        <div class="points left">${
-                          JSON.parse(match?.rawGameLog)?.players[0]?.score || 0
-                        }</div>
-                        <div class="points right">${
-                          JSON.parse(match?.rawGameLog)?.players[1]?.score || 0
-                        }</div>
+                      <div class="timestamp-section" id="timestamp-section">
+                        <span class="last-action" style="font-style:italic;color:${
+                          match?.winner
+                            ? `#3ec1d5`
+                            : matchUpdatedAt < oneHourAgo
+                            ? `#FF4F4B`
+                            : `#00E600`
+                        }">${lastActionLabel}</span>
                       </div>
-                      <div class="breaks">
-                  <div class="breaks-list left">${
-                    limitBreaks
-                      ? match.breaksPlayer1.slice(0, 3).join(", ") || "0"
-                      : match.breaksPlayer1.slice(0, 5).join(", ") || "0" || "0"
-                  }</div>
-                  <div class="breaks-label">Breaks</div>
-                  <div class="breaks-list right">${
-                    limitBreaks
-                      ? match.breaksPlayer2.slice(0, 3).join(", ") || "0"
-                      : match.breaksPlayer2.slice(0, 5).join(", ") || "0" || "0"
-                  }</div>
-                </div>
+                      <div class="actions-section">
+                        <!-- ${videoCameraSVG} // TODO: uncomment when ready -->
+                        <span class="expand-icon">⤢</span>
+                      </div>
                     </div>
+                          ${
+                            match === undefined
+                              ? '<div class="no-match-message">No match found</div>'
+                              : matchUpdatedAt < oneHourAgo
+                              ? match?.winner
+                                ? '<div class="no-match-message">Match ended</div>'
+                                : '<div class="no-match-message">Match paused</div>'
+                              : ""
+                          }
+                          <!-- Snooker Scoreboard Component -->
+                          <div class="scoreboard">
+                          <div class="names-container">
+                            <div class="player-component left">
+                    <img class="player-photo" src="${getPlayerImage(
+                      match?.player1NationIOC || "default"
+                    )}" alt="Player One Photo">
+                    <div class="player-name">${formatName(
+                      match?.player1Name
+                    )}</div>
                   </div>
-                `;
+                  <div class="player-component right">
+                    <div class="player-name">${formatName(
+                      match?.player2Name
+                    )}</div>
+                    <img class="player-photo" src="${getPlayerImage(
+                      match?.player2NationIOC || "default"
+                    )}" alt="Player Two Photo">
+                  </div>
+                        </div>
+                            <div class="frames">
+                              <div class="frames-label">Frames</div>
+                              <div class="frames-content">
+                                <div class="frames-won left">${
+                                  match?.framesPlayer1 || 0
+                                }</div>
+                                <div class="best-of">${match?.bestOf || 0}</div>
+                                <div class="frames-won right">${
+                                  match?.framesPlayer2 || 0
+                                }</div>
+                              </div>
+                            </div>
+                            <div class="scores">
+                              <div class="label">Score</div>
+                              <div class="points left">${
+                                JSON.parse(match?.rawGameLog)?.players[0]
+                                  ?.score || 0
+                              }</div>
+                              <div class="points right">${
+                                JSON.parse(match?.rawGameLog)?.players[1]
+                                  ?.score || 0
+                              }</div>
+                            </div>
+                            <div class="breaks">
+                        <div class="breaks-list left">${
+                          limitBreaks
+                            ? match.breaksPlayer1.slice(0, 3).join(", ") || "0"
+                            : match.breaksPlayer1.slice(0, 5).join(", ") ||
+                              "0" ||
+                              "0"
+                        }</div>
+                        <div class="breaks-label">Breaks</div>
+                        <div class="breaks-list right">${
+                          limitBreaks
+                            ? match.breaksPlayer2.slice(0, 3).join(", ") || "0"
+                            : match.breaksPlayer2.slice(0, 5).join(", ") ||
+                              "0" ||
+                              "0"
+                        }</div>
+                      </div>
+                          </div>
+                        </div>
+                      `;
         }
       }
 
