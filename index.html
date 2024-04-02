@@ -444,6 +444,21 @@
         color: #fff;
       }
 
+      .video-camera-icon {
+        cursor: pointer;
+        /* Adjust the size as needed, to match the expand icon */
+        transform: scale(0.7);
+        margin-right: 10px; /* Space between camera and expand icons */
+      }
+
+      .actions-section {
+        /* make sure this section is flex so it can handle both icons */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 10px; /* adjust as necessary */
+      }
+
       /* Header styles */
       .header {
         display: flex;
@@ -523,7 +538,8 @@
       /* Modal styles */
       .modal {
         display: none;
-        /* Hidden by default */
+        align-items: center;
+        justify-content: center;
         position: fixed;
         z-index: 10;
         left: 0;
@@ -531,30 +547,35 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        /* Enable scroll if needed */
         background-color: rgba(0, 0, 0, 0.4);
-        /* Black with opacity */
       }
 
       .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        /* 15% from the top and centered */
+        background-color: var(--background-color);
+        width: 75vw;
+        height: 75vh;
         padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        /* Could be more or less, depending on screen size */
-        transform: translate(-50%, -50%);
-        position: relative;
-        top: 50%;
-        left: 50%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative; /* This will be the positioning context for the close button */
+      }
+
+      .scoreboard-enlarged .scoreboard {
+        width: 100%; /* this will make the scoreboard fill the modal-content width */
+        margin: 0;
       }
 
       .close-button {
+        position: absolute;
+        top: 0;
+        right: 0;
         color: #aaa;
-        float: right;
-        font-size: 28px;
+        font-size: 32px;
         font-weight: bold;
+        cursor: pointer;
+        padding-right: 10px;
       }
 
       .close-button:hover,
@@ -566,12 +587,9 @@
 
       /* Enlarged scoreboard styles */
       .scoreboard-enlarged {
-        transform: scale(4);
-        /* Enlarge 4 times */
+        transform: scale(3);
         transform-origin: center top;
-        /* Scale from the center top */
-        margin: 0 auto;
-        /* Center it horizontally */
+        margin: 0 auto; /* Center it horizontally */
       }
 
       .gold-text {
@@ -706,6 +724,13 @@
     </div>
 
     <script>
+      const videoCameraSVG = `
+  <svg class="video-camera-icon disabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 7l-7 5 7 5V7z"></path>
+    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+  </svg>
+`;
+
       document.addEventListener("DOMContentLoaded", function () {
         const iconSun = document.getElementById("icon-sun");
         const iconMoon = document.getElementById("icon-moon");
@@ -722,6 +747,15 @@
           localStorage.setItem("theme", "dark"); // Save theme preference
           iconMoon.style.display = "none";
           iconSun.style.display = "block";
+        });
+
+        document.addEventListener("click", function (event) {
+          if (event.target.matches(".expand-icon")) {
+            const scoreboardContent = event.target
+              .closest(".grid-item")
+              .querySelector(".scoreboard");
+            // openModal(scoreboardContent); // TODO: uncomment when modal is ready
+          }
         });
 
         // Initialize the correct icon display based on the current theme
@@ -777,7 +811,7 @@
 
         // Function to open the modal with the content of the clicked scoreboard
         function openModal(scoreboardContent) {
-          modal.style.display = "block";
+          modal.style.display = "flex"; // This should be 'flex' instead of 'block' to work with the flexbox model
           enlargedScoreboard.innerHTML = scoreboardContent.innerHTML;
           // Adjust the size of the enlarged scoreboard if necessary
         }
@@ -820,6 +854,7 @@
 
         function fetchAndDisplayBreaks(date) {
           fetch(`https://rrsb-scoreboard-server.onrender.com/breaks/${date}`)
+            // fetch(`http://localhost:3000/breaks/${date}`)
             .then((response) => response.json())
             .then((data) => updateTable("breaks-table", data.data))
             .catch((error) => console.error("Error fetching data:", error));
@@ -828,15 +863,16 @@
         function fetchAndDisplayLeaderboard() {
           fetch(
             "https://rrsb-scoreboard-server.onrender.com/breaks/leaderboard"
+            // "http://localhost:3000/breaks/leaderboard"
           )
             .then((response) => response.json())
-            .then((data) => updateTable("leaderboard-table", data.data))
+            .then((data) => updateTable("leaderboard-table", data.data, true))
             .catch((error) =>
               console.error("Error fetching leaderboard data:", error)
             );
         }
 
-        function updateTable(tableId, data) {
+        function updateTable(tableId, data, allTimeList) {
           const tableBody = document
             .getElementById(tableId)
             .querySelector("tbody");
@@ -845,7 +881,11 @@
           data.forEach((player) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                                    <td>${player.name}</td>
+                                    <td>${
+                                      allTimeList
+                                        ? player.name
+                                        : player.playerName
+                                    }</td>
                                     <td>${player.highbreaks.join(", ")}</td>
                                 `;
             tableBody.appendChild(row);
@@ -862,22 +902,38 @@
         }
       }
 
-      // Function to handle tab switching and updating the page title
       function handleTabSwitching() {
         const urlParams = new URLSearchParams(window.location.search);
         const tab = urlParams.get("tab");
+        const table = urlParams.get("table"); // Get the table number from URL
         const pageTitleElement = document.getElementById("pageTitle");
 
+        // Handling tab visibility
         if (tab === "livescores") {
           document.getElementById("breaksContent").classList.add("hidden");
           document
             .getElementById("liveScoresContent")
             .classList.remove("hidden");
           pageTitleElement.textContent = "Live Scores";
+          if (table) {
+            openModalForTable(table); // Open the modal for the specific table if parameter is present
+          }
         } else {
           document.getElementById("breaksContent").classList.remove("hidden");
           document.getElementById("liveScoresContent").classList.add("hidden");
           pageTitleElement.textContent = "Daily Breaks";
+        }
+      }
+
+      function openModalForTable(tableNumber) {
+        console.log(`expanding table ${tableNumber}`); // Debugging
+        // Simulate clicking on the expand icon for the given table number
+        const expandIcon = document.querySelector(
+          `.grid-item[data-table-number="${tableNumber}"] .expand-icon`
+        );
+        if (expandIcon) {
+          // TODO: this is never reached
+          expandIcon.click();
         }
       }
 
@@ -1007,7 +1063,7 @@
           gridContainer.innerHTML += `
                   <div class="grid-item ${
                     isMatchLiveOnTableNow ? "" : "no-match"
-                  }">
+                  }" data-table-number="${i}">
                     <div class="grid-item-header">
                 <div class="table-number-section">
                   <span class="table-number" style="float:left;padding-left:20px;">Table ${i}</span>
@@ -1022,7 +1078,8 @@
                   }">${lastActionLabel}</span>
                 </div>
                 <div class="actions-section">
-                  <span class="expand-icon" style="float:right;padding-right:20px;">⤢</span>
+                  <!-- ${videoCameraSVG} // TODO: uncomment when ready -->
+                  <span class="expand-icon">⤢</span>
                 </div>
               </div>
                     ${
