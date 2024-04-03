@@ -834,6 +834,8 @@
       `;
 
       document.addEventListener("DOMContentLoaded", function () {
+        handleTabSwitching();
+
         const iconSun = document.getElementById("icon-sun");
         const iconMoon = document.getElementById("icon-moon");
 
@@ -1017,6 +1019,14 @@
         const pageTitleElement = document.getElementById("pageTitle");
         const name = urlParams.get("name"); // Get the player's name from URL
 
+        // Track page view in Google Analytics
+        function trackPageView() {
+          const queryString = window.location.search;
+          const path = window.location.pathname;
+          const url = path + queryString;
+          gtag("config", "G-DPK8ZQTWBC", { page_path: url });
+        }
+
         // Handling tab visibility
         if (tab === "livescores") {
           document.getElementById("breaksContent").classList.add("hidden");
@@ -1027,6 +1037,7 @@
           if (table) {
             openModalForTable(table); // Open the modal for the specific table if parameter is present
           }
+          trackPageView();
         } else if (tab === "profile" && name) {
           document.getElementById("breaksContent").classList.add("hidden");
           document.getElementById("liveScoresContent").classList.add("hidden");
@@ -1035,10 +1046,12 @@
             .classList.remove("hidden");
           pageTitleElement.textContent = "Player Profile";
           loadPlayerProfile(name); // Load the player profile data
+          trackPageView();
         } else {
           document.getElementById("breaksContent").classList.remove("hidden");
           document.getElementById("liveScoresContent").classList.add("hidden");
           pageTitleElement.textContent = "Daily Breaks";
+          trackPageView();
         }
 
         // Function to load player profile data
