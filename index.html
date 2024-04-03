@@ -684,6 +684,29 @@
       a:focus {
         text-decoration: underline; /* Optional: adds underline on hover for better UX */
       }
+
+      .video-modal {
+        display: none;
+        position: fixed;
+        z-index: 11;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .video-container {
+        width: 80%;
+        max-width: 800px;
+      }
+
+      .video-player {
+        width: 100%;
+        max-height: 90vh;
+      }
     </style>
     <link rel=”shortcut icon” type=”image/png” href=”favicon.png” />
   </head>
@@ -832,6 +855,26 @@
           <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
         </svg>
       `;
+      // Function to open video modal
+      function openVideoModal(streamUrl) {
+        const videoModal = document.getElementById("videoModal");
+        const videoPlayer = document.getElementById("videoPlayer");
+
+        // Set the stream URL
+        videoPlayer.src = streamUrl;
+        videoPlayer.load(); // Load the new video source
+
+        videoModal.style.display = "flex";
+      }
+
+      // Function to close video modal
+      function closeVideoModal() {
+        const videoModal = document.getElementById("videoModal");
+        const videoPlayer = document.getElementById("videoPlayer");
+
+        videoPlayer.pause(); // Stop the video player
+        videoModal.style.display = "none";
+      }
 
       document.addEventListener("DOMContentLoaded", function () {
         handleTabSwitching();
@@ -859,6 +902,27 @@
               .closest(".grid-item")
               .querySelector(".scoreboard");
             // openModal(scoreboardContent); // TODO: uncomment when modal is ready
+          }
+          // Check if the clicked element is a camera icon
+          if (event.target.matches(".video-camera-icon")) {
+            // You will need to replace 'your-stream-url-here' with the actual stream URL for each table
+            openVideoModal("your-stream-url-here"); // TODO: replace
+          }
+        });
+
+        // Listen for clicks outside of the video player to close the modal
+        document
+          .getElementById("videoModal")
+          .addEventListener("click", function (event) {
+            if (event.target === this) {
+              closeVideoModal();
+            }
+          });
+
+        // Close the video when the 'Escape' key is pressed
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            closeVideoModal();
           }
         });
 
@@ -1409,5 +1473,14 @@
         }
       }
     </script>
+    <div id="videoModal" class="video-modal">
+      <div class="video-container">
+        <video id="videoPlayer" class="video-player" controls>
+          <source src="your-stream-url-here" type="video/mp4" />
+          Your browser does not support the video tag or the file format of this
+          video.
+        </video>
+      </div>
+    </div>
   </body>
 </html>
