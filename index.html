@@ -858,11 +858,11 @@
       // Function to open video modal
       function openVideoModal(streamUrl) {
         const videoModal = document.getElementById("videoModal");
-        const videoPlayer = document.getElementById("videoPlayer");
+        // const videoPlayer = document.getElementById("videoPlayer");
 
         // Set the stream URL
-        videoPlayer.src = streamUrl;
-        videoPlayer.load(); // Load the new video source
+        // videoPlayer.src = streamUrl;
+        // videoPlayer.load(); // Load the new video source
 
         videoModal.style.display = "flex";
       }
@@ -906,7 +906,9 @@
           // Check if the clicked element is a camera icon
           if (event.target.matches(".video-camera-icon")) {
             // You will need to replace 'your-stream-url-here' with the actual stream URL for each table
-            openVideoModal("your-stream-url-here"); // TODO: replace
+            openVideoModal(
+              "https://player.twitch.tv/?channel=dlf147&parent=localhost&autoplay=true"
+            ); // TODO: replace
           }
         });
 
@@ -1377,7 +1379,7 @@
                         }">${lastActionLabel}</span>
                       </div>
                       <div class="actions-section">
-                        <!-- ${videoCameraSVG} // TODO: uncomment when ready -->
+                        ${videoCameraSVG} <!--  // TODO: uncomment when ready -->
                         <span class="expand-icon">⤢</span>
                       </div>
                     </div>
@@ -1475,11 +1477,20 @@
     </script>
     <div id="videoModal" class="video-modal">
       <div class="video-container">
-        <video id="videoPlayer" class="video-player" controls>
-          <source src="your-stream-url-here" type="video/mp4" />
+        <iframe
+          src="https://player.twitch.tv/?channel=dlf147&parent=localhost&autoplay=true"
+          height="600"
+          width="800"
+          allowfullscreen
+        >
+        </iframe>
+        <!-- <video id="videoPlayer" class="video-player" controls>
+          <source
+            src="https://monitor.ui.com/43a749a1-5507-460e-adf0-615423a3bdf5"
+          />
           Your browser does not support the video tag or the file format of this
           video.
-        </video>
+        </video> -->
       </div>
     </div>
   </body>
