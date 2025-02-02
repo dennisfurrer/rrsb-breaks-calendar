@@ -29,9 +29,9 @@
       }
 
       .container {
-        width: 90%;
+        width: 98%;
         margin: 0 auto;
-        padding-top: 20px;
+        padding: 0 10px;
       }
 
       .mode-toggle-container {
@@ -607,68 +607,90 @@
         color: green;
       }
 
-      /* Player Profile Page Styling */
+      /* Player Profile Styles */
       .profile-container {
-        max-width: 800px;
-        margin: 20px auto;
         padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: rgba(69, 69, 69, 0.5);
         border-radius: 10px;
-        background-color: var(--table-header-bg-color);
-        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
       }
 
       .player-details {
+        text-align: center;
+        margin-bottom: 30px;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
+      }
+
+      .player-details img {
+        width: 100px;
+        height: 60px;
+        margin-bottom: 10px;
+      }
+
+      .player-details h1 {
+        margin: 0;
+        color: var(--text-color);
+        display: inline-block;
+        font-size: 2em;
       }
 
       .stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        padding: 10px;
       }
 
       .stat-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 15px;
-        background: var(--background-color);
+        background-color: rgba(51, 51, 51, 0.8);
         border-radius: 8px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        text-align: center;
       }
 
       .stat-card h2 {
-        font-size: 1em;
-        color: var(--text-color);
-        margin: 10px 0;
+        margin: 0 0 10px 0;
+        font-size: 0.9em;
+        color: #999;
+        font-weight: normal;
       }
 
-      .stat-card .stat-value {
+      .stat-value {
         font-size: 2em;
-        color: var(--text-color);
         font-weight: bold;
+        color: white;
       }
 
-      .stat-card.full-width {
+      .full-width {
         grid-column: 1 / -1;
+        margin-top: 10px;
+      }
+
+      .match-history-button {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 20px;
+        background-color: var(--table-header-bg-color);
+        border: none;
+        border-radius: 5px;
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: 1.1em;
+        text-decoration: none;
+        text-align: center;
+        width: fit-content;
+      }
+
+      .match-history-button:hover {
+        background-color: #444;
       }
 
       @media (max-width: 768px) {
-        .profile-container {
-          padding: 10px;
-          margin: 10px;
-        }
-
         .stats {
           grid-template-columns: 1fr;
-        }
-
-        .stat-card .stat-value {
-          font-size: 1.5em;
         }
       }
 
@@ -745,6 +767,255 @@
           -moz-appearance: menulist; /* Show native dropdown on Firefox */
           appearance: menulist; /* Show native dropdown */
         }
+      }
+
+      /* Match History Styles */
+      .match-history-container {
+        max-width: none;
+        margin: 10px 5px;
+        padding: 15px 10px;
+        background-color: var(--background-color);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .filter-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin: 20px 0;
+        padding: 10px;
+      }
+
+      .filter-section label {
+        color: var(--text-color);
+        font-size: 1em;
+      }
+
+      .filter-section select {
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        background-color: var(--background-color);
+        color: var(--text-color);
+        font-size: 1em;
+        cursor: pointer;
+      }
+
+      .filter-section select:focus {
+        outline: none;
+        border-color: #3ec1d5;
+      }
+
+      .match-history-title {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .matches-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: var(--background-color);
+      }
+
+      .matches-table th {
+        background-color: #333;
+        color: #fff;
+        padding: 12px;
+        text-align: left;
+        font-weight: bold;
+      }
+
+      .matches-table td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
+      }
+
+      .matches-table tr:hover {
+        background-color: rgba(62, 193, 213, 0.1);
+      }
+
+      .matches-table .current-player {
+        border: 2px solid gold;
+        border-radius: 4px;
+      }
+
+      .matches-table .win {
+        color: #00e600;
+        font-weight: bold;
+      }
+
+      .matches-table .loss {
+        color: #ff4f4b;
+        font-weight: bold;
+      }
+
+      .matches-table .dnf {
+        color: #888;
+        font-style: italic;
+      }
+
+      .matches-table .highest-break {
+        color: #ffd700;
+        font-weight: bold;
+        text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Optimize column widths */
+      .matches-table th,
+      .matches-table td {
+        padding: 6px 8px; /* Further reduce padding */
+      }
+
+      /* Date column */
+      .matches-table th:nth-child(1),
+      .matches-table td:nth-child(1) {
+        min-width: 80px;
+        width: 80px;
+      }
+
+      /* Table number column - just wide enough for "Table" */
+      .matches-table th:nth-child(2),
+      .matches-table td:nth-child(2) {
+        min-width: 35px;
+        width: 35px;
+        text-align: center;
+      }
+
+      /* Player columns */
+      .matches-table th:nth-child(3),
+      .matches-table th:nth-child(4),
+      .matches-table td:nth-child(3),
+      .matches-table td:nth-child(4) {
+        min-width: 120px;
+        width: 120px;
+      }
+
+      /* Match Length column */
+      .matches-table th:nth-child(5),
+      .matches-table td:nth-child(5) {
+        min-width: 70px;
+        width: 70px;
+        text-align: center;
+      }
+
+      /* Score column - just wide enough for "0-0" */
+      .matches-table th:nth-child(6),
+      .matches-table td:nth-child(6) {
+        min-width: 45px;
+        width: 45px;
+        text-align: center;
+      }
+
+      /* Result column - just wide enough for "Lost" */
+      .matches-table th:nth-child(7),
+      .matches-table td:nth-child(7) {
+        min-width: 45px;
+        width: 45px;
+        text-align: center;
+      }
+
+      /* Breaks columns */
+      .matches-table th:nth-child(8),
+      .matches-table th:nth-child(9),
+      .matches-table td:nth-child(8),
+      .matches-table td:nth-child(9) {
+        min-width: 140px;
+        width: 140px;
+      }
+
+      /* Frame details styling */
+      .match-row {
+        cursor: pointer;
+      }
+
+      .match-row:hover {
+        background-color: rgba(62, 193, 213, 0.05);
+      }
+
+      .match-row.expanded {
+        background-color: rgba(62, 193, 213, 0.1);
+      }
+
+      .frame-details {
+        background-color: var(--background-color);
+      }
+
+      .frame-details.hidden {
+        display: none;
+      }
+
+      .frame-details-table {
+        width: 100%;
+        margin: 10px 0;
+        border-collapse: collapse;
+        font-size: 0.9em;
+      }
+
+      /* Match column widths with parent table */
+      .frame-details-table th:nth-child(1),
+      .frame-details-table td:nth-child(1) {
+        width: 35px;
+        min-width: 35px;
+        text-align: center;
+      }
+
+      .frame-details-table th:nth-child(2),
+      .frame-details-table th:nth-child(3),
+      .frame-details-table td:nth-child(2),
+      .frame-details-table td:nth-child(3) {
+        width: 120px;
+        min-width: 120px;
+      }
+
+      .frame-details-table th:nth-child(4),
+      .frame-details-table td:nth-child(4) {
+        width: 45px;
+        min-width: 45px;
+        text-align: center;
+      }
+
+      .frame-details-table th:nth-child(5),
+      .frame-details-table th:nth-child(6),
+      .frame-details-table td:nth-child(5),
+      .frame-details-table td:nth-child(6) {
+        width: 140px;
+        min-width: 140px;
+      }
+
+      /* Score highlighting */
+      .frame-details-table .winning-score {
+        font-weight: bold;
+        color: #00e600;
+      }
+
+      /* Light theme adjustments */
+      :root[data-theme="light"] .frame-details-table .winning-score {
+        background-color: rgba(0, 230, 0, 0.1);
+      }
+
+      /* Center the score column */
+      .frame-details-table td:nth-child(4) {
+        text-align: center;
+      }
+
+      .matches-table a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .matches-table a:hover {
+        text-decoration: underline;
+      }
+
+      /* Don't style links in the current-player cells */
+      .matches-table .current-player a {
+        color: inherit;
+        text-decoration: none;
+        pointer-events: none;
       }
     </style>
     <link rel=”shortcut icon” type=”image/png” href=”favicon.png” />
@@ -838,6 +1109,12 @@
       <div id="playerProfileContent" class="hidden">
         <div class="profile-container">
           <!-- Profile details will be dynamically inserted here -->
+        </div>
+      </div>
+      <!-- Match History Content -->
+      <div id="matchHistoryContent" class="hidden">
+        <div class="match-history-container">
+          <!-- Content will be dynamically inserted here -->
         </div>
       </div>
       <hr />
@@ -1247,6 +1524,19 @@
             pageTitleElement.textContent = "Player Profile";
             loadPlayerProfile(decodeURIComponent(name));
             trackPageView();
+          } else if (tab === "matches" && name) {
+            document.getElementById("breaksContent").classList.add("hidden");
+            document
+              .getElementById("liveScoresContent")
+              .classList.add("hidden");
+            document
+              .getElementById("playerProfileContent")
+              .classList.add("hidden");
+            document
+              .getElementById("matchHistoryContent")
+              .classList.remove("hidden");
+            pageTitleElement.textContent = "Match History";
+            displayMatchHistory(decodeURIComponent(name));
           } else {
             document.getElementById("breaksContent").classList.remove("hidden");
             document
@@ -1525,43 +1815,23 @@
           const playerDetailDiv = document.createElement("div");
           playerDetailDiv.classList.add("player-details");
 
-          // Player image
+          // Player image and name container
           const playerImage = document.createElement("img");
           playerImage.src = getPlayerImage(playerData.nationality);
           playerImage.alt = "Player Nationality";
-          playerDetailDiv.appendChild(playerImage);
 
-          // Player name
           const playerName = document.createElement("h1");
-          playerName.textContent = playerData.name;
-          playerDetailDiv.appendChild(playerName);
+          playerName.textContent = ` ${playerData.name}`;
 
+          playerDetailDiv.appendChild(playerImage);
+          playerDetailDiv.appendChild(playerName);
           profileContainer.appendChild(playerDetailDiv);
 
           // Create stats grid
           const stats = document.createElement("div");
           stats.classList.add("stats");
 
-          // Function to create stat card
-          function createStatCard(title, value) {
-            const statCard = document.createElement("div");
-            statCard.classList.add("stat-card");
-
-            const statTitle = document.createElement("h2");
-            statTitle.textContent = title;
-            statTitle.style.color = "#a1a1a1";
-            statCard.appendChild(statTitle);
-
-            const statValue = document.createElement("div");
-            statValue.classList.add("stat-value");
-            statValue.textContent = value;
-            statCard.appendChild(statValue);
-
-            return statCard;
-          }
-
-          // Add all stats except 'Highest Breaks' (which will be full width)
-          const statsExcludingHighBreaks = [
+          const statsData = [
             { title: "Matches Won", value: playerData.matchesWon },
             { title: "Matches Lost", value: playerData.matchesLost },
             {
@@ -1592,7 +1862,7 @@
             },
           ];
 
-          statsExcludingHighBreaks.forEach((stat) => {
+          statsData.forEach((stat) => {
             stats.appendChild(createStatCard(stat.title, stat.value));
           });
 
@@ -1605,6 +1875,191 @@
           stats.appendChild(highBreaksCard);
 
           profileContainer.appendChild(stats);
+
+          // Add Match History button
+          const matchHistoryButton = document.createElement("a");
+          matchHistoryButton.href = `?tab=matches&name=${encodeURIComponent(
+            playerData.name
+          )}`;
+          matchHistoryButton.classList.add("match-history-button");
+          matchHistoryButton.textContent = "Match History";
+          profileContainer.appendChild(matchHistoryButton);
+        }
+
+        function createStatCard(title, value) {
+          const statCard = document.createElement("div");
+          statCard.classList.add("stat-card");
+
+          const statTitle = document.createElement("h2");
+          statTitle.textContent = title;
+          statCard.appendChild(statTitle);
+
+          const statValue = document.createElement("div");
+          statValue.classList.add("stat-value");
+          statValue.textContent = value;
+          statCard.appendChild(statValue);
+
+          return statCard;
+        }
+
+        // Add new function to handle match history display
+        async function displayMatchHistory(playerName) {
+          const container = document.querySelector(".match-history-container");
+          container.innerHTML = "";
+
+          // Create filter section with label and dropdown
+          const filterSection = document.createElement("div");
+          filterSection.classList.add("filter-section");
+
+          const filterLabel = document.createElement("label");
+          filterLabel.htmlFor = "opponent-select";
+          filterLabel.textContent = "Select Opponent:";
+
+          const opponentSelect = document.createElement("select");
+          opponentSelect.id = "opponent-select";
+          opponentSelect.innerHTML = '<option value="">All Opponents</option>';
+
+          filterSection.appendChild(filterLabel);
+          filterSection.appendChild(opponentSelect);
+          container.appendChild(filterSection);
+
+          // Create matches table
+          const table = document.createElement("table");
+          table.classList.add("matches-table");
+          table.innerHTML = `
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Table</th>
+                <th>Player 1</th>
+                <th>Player 2</th>
+                <th>Match Length</th>
+                <th>Score</th>
+                <th>Result</th>
+                <th>Breaks: Player 1</th>
+                <th>Breaks: Player 2</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          `;
+          container.appendChild(table);
+
+          async function loadMatches(page = 1, opponent = "") {
+            try {
+              const limit = 1000;
+              const url = `https://rrsb-scoreboard-server.onrender.com/matches/player/${encodeURIComponent(
+                playerName
+              )}?page=${page}&limit=${limit}${
+                opponent ? `&opponent=${encodeURIComponent(opponent)}` : ""
+              }`;
+
+              const response = await fetch(url);
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const { data: matches, metadata } = await response.json();
+
+              if (!matches || !Array.isArray(matches)) {
+                throw new Error("Invalid matches data received");
+              }
+
+              const tbody = table.querySelector("tbody");
+              tbody.innerHTML = matches
+                .map((match) => {
+                  try {
+                    const isPlayer1 = match.player1Name === playerName;
+                    const result =
+                      match.winner === playerName
+                        ? "Won"
+                        : match.winner === null
+                        ? "DNF"
+                        : "Lost";
+
+                    // Determine which player is the opponent
+                    const opponentName = isPlayer1
+                      ? match.player2Name
+                      : match.player1Name;
+
+                    return `
+                    <tr>
+                      <td>${new Date(match.date).toLocaleDateString()}</td>
+                      <td>${match.tableNumber || "-"}</td>
+                      <td class="${isPlayer1 ? "current-player" : ""}">
+                        ${
+                          isPlayer1
+                            ? match.player1Name
+                            : `<a href="?tab=profile&name=${encodeURIComponent(
+                                match.player1Name
+                              )}">${match.player1Name}</a>`
+                        }
+                      </td>
+                      <td class="${!isPlayer1 ? "current-player" : ""}">
+                        ${
+                          !isPlayer1
+                            ? match.player2Name
+                            : `<a href="?tab=profile&name=${encodeURIComponent(
+                                match.player2Name
+                              )}">${match.player2Name}</a>`
+                        }
+                      </td>
+                      <td>Best of ${match.bestOf}</td>
+                      <td>${match.framesPlayer1}-${match.framesPlayer2}</td>
+                      <td class="${
+                        result === "Won"
+                          ? "win"
+                          : result === "Lost"
+                          ? "loss"
+                          : "dnf"
+                      }">${result}</td>
+                      <td>${match.topBreaksPlayer1?.join(", ") || "-"}</td>
+                      <td>${match.topBreaksPlayer2?.join(", ") || "-"}</td>
+                    </tr>`;
+                  } catch (e) {
+                    console.error("Error processing match:", e);
+                    return "";
+                  }
+                })
+                .join("");
+
+              // Populate opponent selector if it's empty
+              if (opponentSelect && opponentSelect.options.length <= 1) {
+                try {
+                  const playersResponse = await fetch(
+                    "https://rrsb-scoreboard-server.onrender.com/players"
+                  );
+                  const { data: players } = await playersResponse.json();
+
+                  // Sort players alphabetically
+                  const sortedPlayers = players.sort((a, b) =>
+                    a.localeCompare(b)
+                  );
+
+                  // Add options to select
+                  opponentSelect.innerHTML =
+                    '<option value="">All Opponents</option>' +
+                    sortedPlayers
+                      .map(
+                        (player) =>
+                          `<option value="${player}">${player}</option>`
+                      )
+                      .join("");
+                } catch (e) {
+                  console.warn("Failed to load opponents list:", e);
+                }
+              }
+            } catch (error) {
+              console.error("Error loading matches:", error);
+              container.innerHTML = `<p>Error loading match history: ${error.message}</p>`;
+            }
+          }
+
+          // Initial load
+          loadMatches();
+
+          // Handle opponent filter changes
+          opponentSelect.addEventListener("change", () => {
+            loadMatches(1, opponentSelect.value);
+          });
         }
       });
     </script>
