@@ -1117,6 +1117,7 @@
           <table id="break-matrix-table" style="width: auto">
             <thead>
               <tr>
+                <th>Rank</th>
                 <th>Player Name</th>
                 <th>Total Frames Played</th>
                 <th>20+</th>
@@ -1365,9 +1366,10 @@
             .querySelector("tbody");
           tbody.innerHTML = ""; // clear existing
 
-          data.forEach((row) => {
+          data.forEach((row, index) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
+            <td>${index + 1}</td>
       <td><a href="?tab=profile&name=${encodeURIComponent(row.player_name)}">${
               row.player_name
             }</a></td>
@@ -1957,6 +1959,14 @@
             {
               title: "Matches Not Finished",
               value: playerData.incompleteMatches,
+            },
+            {
+              title: "Decider Win Rate (%)",
+              value: playerData.deciderWinRate + "%",
+            },
+            {
+              title: "Longest Win Streak",
+              value: playerData.longestWinStreak,
             },
           ];
 
