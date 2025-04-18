@@ -1273,7 +1273,19 @@
           }
         }
 
+        function setupAutoRefreshIfLiveScores() {
+          const params = new URLSearchParams(window.location.search);
+          const tab = params.get("tab");
+
+          if (tab === "livescores") {
+            setTimeout(() => {
+              window.location.reload();
+            }, 15000);
+          }
+        }
+
         handleTabSwitching();
+        setupAutoRefreshIfLiveScores();
 
         // Rest of the initialization code
         iconSun.addEventListener("click", function () {
@@ -1887,9 +1899,15 @@
           }
         }
 
-        createScoreboardGrid();
-        // Set the interval to re-run the function every 15 seconds
-        setInterval(createScoreboardGrid, 15000);
+        const isLiveScoresPage =
+          new URLSearchParams(window.location.search).get("tab") ===
+          "livescores";
+
+        if (isLiveScoresPage) {
+          setInterval(() => {
+            window.location.reload();
+          }, 5000); // 30 seconds
+        }
 
         async function loadPlayerProfile(playerName) {
           try {
@@ -1968,10 +1986,17 @@
               title: "Longest Win Streak",
               value: playerData.longestWinStreak,
             },
+            {
+              title: "Most Frequent Opponent",
+              value: playerData.mostFrequentOpponent.opponent,
+              tooltip: `Total Matches Played: ${playerData.mostFrequentOpponent.total_matches} matches\nWins: ${playerData.mostFrequentOpponent.wins}\nWin Percentage: ${playerData.mostFrequentOpponent.win_percentage}%`,
+            },
           ];
 
           statsData.forEach((stat) => {
-            stats.appendChild(createStatCard(stat.title, stat.value));
+            stats.appendChild(
+              createStatCard(stat.title, stat.value, stat.tooltip)
+            );
           });
 
           // High breaks stat (full width)
@@ -1994,9 +2019,12 @@
           profileContainer.appendChild(matchHistoryButton);
         }
 
-        function createStatCard(title, value) {
+        function createStatCard(title, value, tooltip = "") {
           const statCard = document.createElement("div");
           statCard.classList.add("stat-card");
+          if (tooltip) {
+            statCard.title = tooltip;
+          }
 
           const statTitle = document.createElement("h2");
           statTitle.textContent = title;
