@@ -223,8 +223,8 @@
         segments: 64, // high poly
         restitution: 0.9,
         friction: 0.15,
-        linearDamping: 0.3,
-        angularDamping: 0.3
+        linearDamping: 0.6, // Increased for faster stopping
+        angularDamping: 0.6  // Increased for faster stopping
       },
 
       // Camera POV
@@ -525,7 +525,8 @@
         }
 
         // 3. White ball (cue ball) - positioned in D for break-off
-        this.whiteBall = addBall('white', { x: 0.05, z: 1.0 }, 'white');
+        // Positioned halfway between brown and yellow
+        this.whiteBall = addBall('white', { x: 0.15, z: 1.0 }, 'white');
 
         console.log(`Created ${this.balls.length} snooker balls`);
         return this.balls;
@@ -831,29 +832,24 @@
       createTimeline() {
         this.phases = [
           {
-            name: 'Initial Setup',
-            duration: 2000,
-            action: (progress) => this.phaseInitialSetup(progress)
+            name: 'Aim',
+            duration: 1500,
+            action: (progress) => this.phaseAim(progress)
           },
           {
-            name: 'Cue Positioning',
-            duration: 2000,
-            action: (progress) => this.phaseCuePositioning(progress)
+            name: 'Backswing',
+            duration: 800,
+            action: (progress) => this.phaseBackswing(progress)
           },
           {
-            name: 'Cue Strike',
-            duration: 500,
-            action: (progress) => this.phaseCueStrike(progress)
+            name: 'Strike',
+            duration: 200,
+            action: (progress) => this.phaseStrike(progress)
           },
           {
             name: 'Shot Simulation',
-            duration: 7500,
+            duration: 8000,
             action: (progress) => this.phaseShotSimulation(progress)
-          },
-          {
-            name: 'Final Position',
-            duration: 3000,
-            action: (progress) => this.phaseFinalPosition(progress)
           },
           {
             name: 'Loop Pause',
@@ -900,116 +896,124 @@
         }
       }
 
-      phaseInitialSetup(progress) {
-        // Camera pan showing table setup
-        // Smooth ease-in-out
-        const t = this.easeInOutCubic(progress);
-
-        // Start from high overview, move to POV position
-        const startPos = new THREE.Vector3(0, 1.5, 1.0);
-        const endPos = new THREE.Vector3(
-          this.ballManager.whiteBall.position.x,
-          this.ballManager.whiteBall.position.y + 0.15,
-          this.ballManager.whiteBall.position.z + 0.35
-        );
-
-        this.camera.position.lerpVectors(startPos, endPos, t);
-
-        const startLookAt = new THREE.Vector3(0, 0, 0);
-        const endLookAt = new THREE.Vector3(0, 0, -1.5);
-        const lookAt = new THREE.Vector3().lerpVectors(startLookAt, endLookAt, t);
-        this.camera.lookAt(lookAt);
-      }
-
-      phaseCuePositioning(progress) {
-        // Show cue moving into position
-        const t = this.easeInOutCubic(progress);
-
+      phaseAim(progress) {
+        // Cue is positioned and ready to strike
         if (progress === 0) {
-          // Position cue on first frame
+          // Position cue behind white ball
           this.cueStick.position(
             this.ballManager.whiteBall,
             this.ballManager.targetRed
           );
-        }
 
-        // Subtle cue adjustment animation (optional)
+          // Store initial cue position for animation
+          this.cueInitialPosition = this.cueStick.cue.position.clone();
+          this.cueDirection = new THREE.Vector3()
+            .subVectors(this.ballManager.targetRed.position, this.ballManager.whiteBall.position)
+            .normalize();
+        }
       }
 
-      phaseCueStrike(progress) {
-        // Cue strikes white ball
+      phaseBackswing(progress) {
+        // Animate cue pulling back
+        const t = this.easeInOutCubic(progress);
+        const pullBackDistance = 0.15; // 15cm backswing
+
+        if (this.cueInitialPosition && this.cueDirection) {
+          const offset = this.cueDirection.clone().multiplyScalar(-pullBackDistance * t);
+          this.cueStick.cue.position.copy(this.cueInitialPosition).add(offset);
+        }
+      }
+
+      phaseStrike(progress) {
+        // Animate cue striking forward
+        const t = this.easeInCubic(progress);
+        const strikeDistance = 0.25; // 25cm forward strike
+
         if (progress === 0) {
-          // Calculate and apply strike force
-          const whiteBall = this.ballManager.whiteBall;
-          const targetRed = this.ballManager.targetRed;
-
-          const direction = new THREE.Vector3()
-            .subVectors(targetRed.position, whiteBall.position)
-            .normalize();
-
-          // Find the physics body for white ball
-          const whiteBallBody = this.physics.bodies.find(
-            b => b.mesh === whiteBall
-          )?.body;
-
-          if (whiteBallBody) {
-            // Medium power safety shot
-            const power = 4.5;
-            this.physics.applyCueStrike(whiteBallBody, direction, power);
-          }
+          // Store the back position
+          this.cueBackPosition = this.cueStick.cue.position.clone();
         }
 
-        if (progress > 0.4) {
-          // Hide cue after strike
+        if (this.cueBackPosition && this.cueDirection) {
+          const offset = this.cueDirection.clone().multiplyScalar(strikeDistance * t);
+          this.cueStick.cue.position.copy(this.cueBackPosition).add(offset);
+        }
+
+        // Apply force at midpoint of strike
+        if (progress >= 0.5 && !this.strikeApplied) {
+          this.strikeApplied = true;
+          this.applyBreakoffShot();
+        }
+
+        // Hide cue at end of strike
+        if (progress > 0.9) {
           this.cueStick.hide();
         }
       }
 
-      phaseShotSimulation(progress) {
-        // Let physics run
-        // Camera tracks white ball
-        this.trackWhiteBall();
+      applyBreakoffShot() {
+        // Calculate exact safety shot physics
+        const whiteBall = this.ballManager.whiteBall;
+        const targetRed = this.ballManager.targetRed;
+
+        // Find the physics body for white ball
+        const whiteBallBody = this.physics.bodies.find(
+          b => b.mesh === whiteBall
+        )?.body;
+
+        if (!whiteBallBody) return;
+
+        const whitePos = whiteBall.position;
+        const redPos = targetRed.position;
+
+        // Calculate direction - aim LEFT of red center for deflection toward black cushion
+        // Half-ball contact on left side sends white toward top (black cushion)
+        const toRed = new THREE.Vector3().subVectors(redPos, whitePos);
+
+        // Offset LEFT and slightly forward to aim toward black cushion after contact
+        const aimOffset = new THREE.Vector3(-0.03, 0, -0.02); // Left and toward black cushion
+        const direction = toRed.clone().add(aimOffset).normalize();
+
+        // Safety shot power - doubled for cushion reach
+        const power = 0.5; // Moderate power for safety shot
+
+        this.physics.applyCueStrike(whiteBallBody, direction, power);
+
+        console.log('Safety shot applied:');
+        console.log('  Power:', power);
+        console.log('  Direction:', direction);
+        console.log('  White position:', whitePos);
+        console.log('  Target red position:', redPos);
       }
 
-      phaseFinalPosition(progress) {
-        // Camera adjusts to show final position
-        const t = this.easeInOutCubic(progress);
+      easeInCubic(t) {
+        return t * t * t;
+      }
 
-        const whiteBall = this.ballManager.whiteBall;
-        const brownBall = this.ballManager.balls.find(
-          b => b.userData.colorName === 'brown'
-        );
-
-        if (whiteBall && brownBall) {
-          // Camera angle to show white behind brown
-          const startPos = this.camera.position.clone();
-          const endPos = new THREE.Vector3(
-            brownBall.position.x + 0.3,
-            brownBall.position.y + 0.2,
-            brownBall.position.z + 0.5
-          );
-
-          this.camera.position.lerpVectors(startPos, endPos, t);
-          this.camera.lookAt(whiteBall.position);
-        }
+      phaseShotSimulation(progress) {
+        // Let physics run
+        // Keep camera in POV position, subtly track white ball
+        this.trackWhiteBall();
       }
 
       phaseLoopPause(progress) {
         // Pause before loop
-        // Could add fade out effect here
+        // Keep camera steady
       }
 
       trackWhiteBall() {
-        // Smooth camera tracking of white ball
+        // Subtle camera tracking of white ball (only look direction, not position)
         const whiteBall = this.ballManager.whiteBall;
         if (!whiteBall) return;
 
+        // Only adjust look direction, keep camera position fixed
         const targetLookAt = whiteBall.position.clone();
         const currentLookAt = new THREE.Vector3(0, 0, -10);
         this.camera.getWorldDirection(currentLookAt);
         currentLookAt.multiplyScalar(10).add(this.camera.position);
 
-        currentLookAt.lerp(targetLookAt, 0.05);
+        // Very subtle tracking (reduced from 0.05 to 0.02)
+        currentLookAt.lerp(targetLookAt, 0.02);
         this.camera.lookAt(currentLookAt);
       }
 
@@ -1025,11 +1029,21 @@
           }
         });
 
-        // Reset camera
-        this.camera.position.set(0, 1.5, 1.0);
-        this.camera.lookAt(0, 0, 0);
+        // Reset camera to POV position
+        const whiteBall = this.ballManager.whiteBall;
+        if (whiteBall) {
+          this.camera.position.set(
+            whiteBall.position.x,
+            whiteBall.position.y + 0.15,
+            whiteBall.position.z + 0.35
+          );
+          this.camera.lookAt(0, 0, -1.5);
+        }
 
+        // Reset animation flags
+        this.strikeApplied = false;
         this.currentPhase = 0;
+
         console.log('Animation reset');
       }
 
@@ -1213,7 +1227,9 @@
 
         await this.delay(300);
 
-        // Adjust camera to match POV image (behind white ball, looking down table)
+        this.loadingManager.updateProgress('Setting camera POV...');
+
+        // Set camera to POV position (behind white ball, looking down table)
         const whiteBall = this.ballManager.whiteBall;
         if (whiteBall) {
           // Position camera behind and slightly above white ball
@@ -1225,6 +1241,8 @@
           // Look toward the reds
           this.camera.lookAt(0, 0, -1.5);
         }
+
+        await this.delay(300);
 
         this.loadingManager.updateProgress('Ready!');
         await this.delay(500);
