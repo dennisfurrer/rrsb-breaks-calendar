@@ -12,6 +12,8 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Chart.js Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
     <!-- Anime.js for page transitions -->
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
@@ -313,48 +315,6 @@
       }
 
       /* ========================================
-         SNOOKER CUE BALL PAGE TRANSITION
-         ======================================== */
-
-      .transition-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(ellipse at center, rgba(13, 77, 60, 0.95) 0%, rgba(4, 30, 28, 0.98) 100%);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-        opacity: 0;
-        visibility: hidden;
-        transition: visibility 0s 0.3s, opacity 0.3s ease;
-      }
-
-      .transition-overlay.active {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: all;
-        transition: visibility 0s, opacity 0.3s ease;
-      }
-
-      #transition-svg {
-        width: 100%;
-        max-width: 1200px;
-        height: auto;
-        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
-      }
-
-      /* Responsive sizing for mobile */
-      @media (max-width: 768px) {
-        #transition-svg {
-          width: 90%;
-        }
-      }
-
-      /* ========================================
          LAYOUT & CONTAINER
          ======================================== */
 
@@ -449,6 +409,511 @@
         .table-container {
           overflow-x: auto;
           /* allows table to scroll on x-axis on small screens */
+        }
+      }
+
+      /* ========================================
+         DAILY BREAKS - GLASS CARD DESIGN
+         ======================================== */
+
+      .date-selector-glass {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-4);
+        margin: var(--spacing-8) auto;
+        max-width: 400px;
+      }
+
+      .date-nav-btn {
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(20, 184, 166, 0.4);
+        cursor: pointer;
+        background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(20, 184, 166, 0.1));
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        border-radius: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+
+      .date-nav-btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .date-nav-btn:hover::before {
+        opacity: 1;
+      }
+
+      .date-nav-btn:hover {
+        background: linear-gradient(135deg, rgba(20, 184, 166, 0.3), rgba(20, 184, 166, 0.2));
+        border-color: rgba(20, 184, 166, 0.6);
+        transform: scale(1.08);
+        box-shadow: 0 6px 20px rgba(20, 184, 166, 0.3);
+      }
+
+      .date-nav-btn:active {
+        transform: scale(0.92);
+      }
+
+      .date-nav-btn svg {
+        stroke: rgba(20, 184, 166, 1);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+      }
+
+      .date-nav-btn:hover svg {
+        stroke: rgba(20, 184, 166, 1);
+        transform: scale(1.1);
+      }
+
+      .date-input-glass {
+        flex: 1;
+        padding: var(--spacing-3) var(--spacing-5);
+        background: var(--glass-bg-medium);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        border: 2px solid rgba(20, 184, 166, 0.3);
+        border-radius: 14px;
+        color: var(--text-primary);
+        font-size: var(--text-lg);
+        font-weight: var(--font-bold);
+        font-family: var(--font-display);
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        letter-spacing: 0.5px;
+      }
+
+      .date-input-glass:hover {
+        background: var(--glass-bg-heavy);
+        border-color: rgba(20, 184, 166, 0.5);
+        transform: scale(1.02);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .date-input-glass:focus {
+        outline: none;
+        border-color: rgba(20, 184, 166, 0.8);
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15), 0 6px 20px rgba(0, 0, 0, 0.3);
+        transform: scale(1.02);
+      }
+
+      /* Style the calendar icon in date input */
+      .date-input-glass::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+      }
+
+      .date-input-glass::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+      }
+
+      /* Chart Container */
+      .chart-container {
+        margin: var(--spacing-6) auto var(--spacing-8);
+        max-width: 900px;
+        padding: var(--spacing-6);
+        min-height: 300px;
+        position: relative;
+      }
+
+      .chart-title {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-extrabold);
+        font-family: var(--font-display);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-5);
+        text-align: center;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      #daily-break-chart {
+        width: 100% !important;
+        height: 280px !important;
+      }
+
+      /* Empty State */
+      .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: var(--spacing-10) var(--spacing-8);
+        margin: 0 auto;
+        max-width: 400px;
+        background: var(--glass-bg-light);
+        backdrop-filter: blur(var(--blur-lg));
+        -webkit-backdrop-filter: blur(var(--blur-lg));
+        border: var(--border-glass);
+        border-radius: 24px;
+        animation: cardFadeIn 0.6s ease;
+        justify-self: center;
+      }
+
+      .red-triangle-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        margin: 0 auto var(--spacing-6);
+        opacity: 0.6;
+      }
+
+      .red-ball {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #ff6b6b, #e84545, #c92a2a);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        margin: 0 3px;
+        animation: iconFloat 3s ease-in-out infinite;
+      }
+
+      .red-ball:nth-child(odd) {
+        animation-delay: 0.3s;
+      }
+
+      .empty-state-title {
+        font-size: var(--text-3xl);
+        font-weight: var(--font-extrabold);
+        font-family: var(--font-display);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-4);
+      }
+
+      .empty-state-message {
+        font-size: var(--text-lg);
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* Breaks Grid */
+      .breaks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: var(--spacing-6);
+        margin: var(--spacing-6) 0;
+      }
+
+      @media (max-width: 768px) {
+        .breaks-grid {
+          grid-template-columns: 1fr;
+          gap: var(--spacing-4);
+        }
+      }
+
+      /* Player Break Card */
+      .player-break-card {
+        background: var(--glass-bg-medium);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        border: var(--border-glass);
+        border-radius: 20px;
+        padding: var(--spacing-3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: cardFadeIn 0.5s ease backwards;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Animated gradient overlay */
+      .player-break-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(20, 184, 166, 0.1),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .player-break-card:hover::before {
+        left: 100%;
+      }
+
+      .player-break-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        background: var(--glass-bg-heavy);
+        border-color: rgba(20, 184, 166, 0.3);
+      }
+
+      /* Player Rank Badge */
+      .player-rank-badge {
+        position: absolute;
+        top: var(--spacing-2);
+        right: var(--spacing-2);
+        min-width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        transition: transform 0.3s ease;
+      }
+
+      .player-rank-badge:hover {
+        transform: scale(1.1) rotate(10deg);
+      }
+
+      .player-rank-badge.rank-1,
+      .player-rank-badge.rank-2,
+      .player-rank-badge.rank-3 {
+        background: radial-gradient(circle at 30% 30%, #fff9c4, #ffd700, #ffb300);
+        animation: rankPulse 2s ease-in-out infinite, rankRotate 6s linear infinite;
+      }
+
+      @keyframes cardFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Card Header */
+      .card-player-header {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-2);
+        margin-bottom: calc(var(--spacing-5) * 0.5);
+        padding-bottom: var(--spacing-2);
+        border-bottom: 1px solid rgba(20, 184, 166, 0.2);
+        position: relative;
+        z-index: 1;
+      }
+
+      .player-flag-card {
+        width: 32px;
+        height: 22px;
+        border-radius: 4px;
+        object-fit: cover;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .player-name-card {
+        flex: 1;
+        font-size: var(--text-lg);
+        font-weight: var(--font-extrabold);
+        font-family: var(--font-display);
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        letter-spacing: 0.5px;
+      }
+
+      .player-name-card:hover {
+        color: rgba(20, 184, 166, 1);
+        text-shadow: 0 0 20px rgba(20, 184, 166, 0.6);
+        transform: translateX(4px);
+      }
+
+      /* Card Stats Summary */
+      .card-stats-summary {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: calc(var(--spacing-5) * 0.5);
+        padding: var(--spacing-2);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(20, 184, 166, 0.15));
+        border-radius: 12px;
+        border: 1px solid rgba(20, 184, 166, 0.25);
+        position: relative;
+        z-index: 1;
+        box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .stat-item-small {
+        text-align: center;
+        transition: transform 0.3s ease;
+        cursor: default;
+      }
+
+      .stat-item-small:hover {
+        transform: scale(1.1);
+      }
+
+      .stat-label-small {
+        font-size: 0.625rem;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        display: block;
+        margin-bottom: calc(var(--spacing-2) * 0.5);
+        font-weight: var(--font-semibold);
+      }
+
+      .stat-value-small {
+        font-size: var(--text-xl);
+        font-weight: var(--font-extrabold);
+        color: rgba(20, 184, 166, 1);
+        font-family: var(--font-display);
+        text-shadow: 0 1px 4px rgba(20, 184, 166, 0.5);
+        display: block;
+      }
+
+      .stat-item-small:first-child .stat-value-small {
+        color: #ffd700;
+        text-shadow: 0 2px 12px rgba(255, 215, 0, 0.6);
+      }
+
+      @keyframes rankPulse {
+        0%, 100% {
+          box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        50% {
+          box-shadow: 0 8px 30px rgba(255, 215, 0, 0.8), 0 0 50px rgba(255, 215, 0, 0.5);
+        }
+      }
+
+      @keyframes rankRotate {
+        0% { filter: hue-rotate(0deg); }
+        100% { filter: hue-rotate(360deg); }
+      }
+
+      /* Break Badges Container */
+      .breaks-badges {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+        overflow-x: auto;
+        padding-bottom: calc(var(--spacing-2) * 0.5);
+        /* Smooth scrolling */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Custom scrollbar styling */
+      .breaks-badges::-webkit-scrollbar {
+        height: 4px;
+      }
+
+      .breaks-badges::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 2px;
+      }
+
+      .breaks-badges::-webkit-scrollbar-thumb {
+        background: rgba(20, 184, 166, 0.4);
+        border-radius: 2px;
+        transition: background 0.3s ease;
+      }
+
+      .breaks-badges::-webkit-scrollbar-thumb:hover {
+        background: rgba(20, 184, 166, 0.6);
+      }
+
+      /* Break Badge */
+      .break-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: var(--font-bold);
+        font-family: var(--font-display);
+        color: white;
+        transition: all 0.2s ease;
+        animation: badgePop 0.3s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+      }
+
+      .break-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      @keyframes badgePop {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Break Color Coding */
+      /* Daily Breaks - Medal System (Top 3 Across All Players) */
+      .break-grey {
+        background: rgba(100, 100, 110, 0.4);
+        color: rgba(180, 180, 190, 1);
+        border-color: rgba(120, 120, 130, 0.5);
+      }
+
+      .break-bronze {
+        background: linear-gradient(135deg, rgba(205, 127, 50, 0.4), rgba(180, 100, 40, 0.5));
+        color: rgba(255, 200, 150, 1);
+        border-color: rgba(205, 127, 50, 0.6);
+        box-shadow: 0 0 12px rgba(205, 127, 50, 0.3);
+      }
+
+      .break-silver {
+        background: linear-gradient(135deg, rgba(192, 192, 192, 0.4), rgba(160, 160, 160, 0.5));
+        color: rgba(240, 240, 250, 1);
+        border-color: rgba(192, 192, 192, 0.6);
+        box-shadow: 0 0 12px rgba(192, 192, 192, 0.3);
+      }
+
+      .break-gold {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.5), rgba(255, 185, 0, 0.6));
+        color: rgba(255, 255, 230, 1);
+        border-color: rgba(255, 215, 0, 0.7);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        font-weight: var(--font-extrabold);
+      }
+
+      @keyframes rainbowShift {
+        0%, 100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      @keyframes centuryGlow {
+        0%, 100% {
+          box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+        }
+        50% {
+          box-shadow: 0 0 35px rgba(255, 215, 0, 0.8);
         }
       }
 
@@ -678,19 +1143,24 @@
         display: flex;
         justify-content: space-between;
         /* Ensures that there is space between the two player components */
-        padding: 0 5%;
+        padding: 0 3%;
         /* Adds padding to the left and right inside the container */
         padding-top: 10px;
         padding-bottom: 10px;
+        gap: var(--spacing-4);
       }
 
       .player-component {
         display: flex;
         align-items: center;
         /* Aligns items vertically */
-        /* width: 45%; Player component takes up 45% width */
+        flex: 1;
+        max-width: 48%;
+        /* Player component takes up max 48% width */
         justify-content: center;
         /* Centers the children within the component */
+        min-width: 0;
+        /* Allow flex item to shrink below content size */
       }
 
       .player-component.right {
@@ -707,6 +1177,8 @@
         margin: 0 10px;
         /* Adds margin to both sides for consistent spacing */
         opacity: 0.8;
+        flex-shrink: 0;
+        /* Prevent flag from shrinking */
         /* border-radius: 50%; */
       }
 
@@ -723,6 +1195,10 @@
         /* Prevents the name from wrapping and ensures it's on the same row */
         margin: 0 10px;
         /* Adds margin to both sides for consistent spacing */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 1;
+        /* Allow name to shrink if needed */
       }
 
       /* Adjust the left and right components' margins */
@@ -741,20 +1217,20 @@
         /* Aligns the spacing to be consistent with the left */
       }
 
-      /* Base styles for large screens */
+      /* Live Scores - Base styles for large screens */
       .scoreboard-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        /* 3 columns */
-        grid-gap: 20px;
-        padding: 20px 0;
+        grid-gap: var(--spacing-6);
+        padding: var(--spacing-8) var(--spacing-6);
+        max-width: 2000px;
+        margin: 0 auto;
       }
 
       /* Styles for medium screens (e.g., tablets) */
       @media screen and (max-width: 1024px) {
         .scoreboard-grid {
           grid-template-columns: repeat(2, 1fr);
-          /* 2 columns */
         }
       }
 
@@ -762,32 +1238,112 @@
       @media screen and (max-width: 768px) {
         .scoreboard-grid {
           grid-template-columns: 1fr;
-          /* 1 column */
-          padding: 10px 0;
+          padding: var(--spacing-4) var(--spacing-2);
         }
       }
 
       .grid-item {
-        background: #333;
-        padding: 10px;
-        border-radius: 10px;
-        /* Optional: Adds rounded corners to the cards */
+        background: linear-gradient(135deg, rgba(20, 25, 35, 0.9), rgba(25, 30, 40, 0.95));
+        backdrop-filter: blur(var(--blur-lg));
+        -webkit-backdrop-filter: blur(var(--blur-lg));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: var(--spacing-6);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        animation: cardFadeIn 0.5s ease backwards;
+      }
+
+      .grid-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(20, 184, 166, 0.3);
+        border-color: rgba(20, 184, 166, 0.4);
+      }
+
+      /* Live indicator for active matches */
+      .grid-item[data-status="active"]::before {
+        content: '';
+        position: absolute;
+        top: var(--spacing-4);
+        left: var(--spacing-4);
+        width: 12px;
+        height: 12px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
+        animation: livePulse 2s ease-in-out infinite;
+      }
+
+      @keyframes livePulse {
+        0%, 100% {
+          opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.15);
+          box-shadow: 0 0 20px rgba(16, 185, 129, 1);
+        }
+      }
+
+      /* Paused indicator */
+      .grid-item[data-status="paused"]::before {
+        content: '';
+        position: absolute;
+        top: var(--spacing-4);
+        left: var(--spacing-4);
+        width: 12px;
+        height: 12px;
+        background: #ef4444;
+        border-radius: 50%;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+        animation: pausedGlow 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pausedGlow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
+      /* Ended indicator */
+      .grid-item[data-status="ended"]::before {
+        content: '';
+        position: absolute;
+        top: var(--spacing-4);
+        left: var(--spacing-4);
+        width: 12px;
+        height: 12px;
+        background: #6b7280;
+        border-radius: 50%;
+        opacity: 0.6;
       }
 
       .table-number {
-        font-size: 1.5em;
-        color: #fff;
+        font-size: var(--text-xl);
+        font-weight: var(--font-bold);
+        color: rgba(240, 240, 250, 1);
+        letter-spacing: 0.5px;
       }
 
       .last-action {
-        color: #fff;
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+        letter-spacing: 0.3px;
       }
 
       .expand-icon {
         cursor: pointer;
         font-size: 1.5em;
-        /* Adjust icon size as needed */
-        color: #fff;
+        color: rgba(220, 220, 240, 0.8);
+        transition: all 0.2s ease;
+      }
+
+      .expand-icon:hover {
+        color: rgba(20, 184, 166, 1);
+        transform: scale(1.1);
       }
 
       .video-camera-icon {
@@ -811,22 +1367,112 @@
         align-items: center;
         justify-content: space-between;
         padding: 10px 0;
+        position: relative;
       }
 
       .page-title {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
         text-align: center;
-        padding-right: 5%;
-        font-size: 2em;
-        flex-grow: 1;
-        margin-left: 5%;
+        font-size: 1.75rem;
+        font-weight: var(--font-extrabold);
+        letter-spacing: 1px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(20, 184, 166, 0.9));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
+        pointer-events: none;
+        font-family: var(--font-display);
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+      }
+
+      @media (max-width: 768px) {
+        .page-title {
+          font-size: 1.25rem;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      /* Section title for content areas (not header) */
+      .section-title {
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: var(--font-extrabold);
+        letter-spacing: 1px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(20, 184, 166, 0.85));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: var(--spacing-8) 0 var(--spacing-6) 0;
+        font-family: var(--font-display);
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+        position: relative;
+      }
+
+      .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.8), transparent);
+        border-radius: 2px;
+      }
+
+      @media (max-width: 768px) {
+        .section-title {
+          font-size: 1.25rem;
+          margin: var(--spacing-6) 0 var(--spacing-4) 0;
+          letter-spacing: 0.5px;
+        }
+
+        .section-title::after {
+          width: 40px;
+          height: 2px;
+          bottom: -6px;
+        }
       }
 
       .burger-menu {
-        width: 5%;
+        width: 40px;
+        height: 40px;
         cursor: pointer;
-        font-size: 3rem;
         display: flex;
+        flex-direction: column;
         align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: rgba(20, 184, 166, 0.1);
+        border: 1px solid rgba(20, 184, 166, 0.3);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 101;
+        padding: 8px;
+      }
+
+      .burger-menu:hover {
+        background: rgba(20, 184, 166, 0.2);
+        border-color: rgba(20, 184, 166, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+      }
+
+      .burger-line {
+        width: 20px;
+        height: 2px;
+        background: rgba(20, 184, 166, 1);
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+
+      .burger-menu:hover .burger-line {
+        background: rgba(20, 184, 166, 1);
+        width: 24px;
       }
 
       .section-header .burger-menu {
@@ -835,28 +1481,60 @@
 
       .section-header::after {
         content: "";
-        width: 5%;
+        width: 40px;
         visibility: hidden;
       }
 
+      /* Sidebar slide-out menu */
       .menu-content {
         display: none;
-        position: absolute;
-        background-color: var(--background-color);
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-        padding: 12px 16px;
-        z-index: 1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 240px;
+        height: 100vh;
+        background: rgba(4, 30, 28, 0.98);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 80px 20px 20px;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(0);
+        }
       }
 
       .menu-item {
-        padding: 12px 16px;
+        padding: 16px 20px;
         text-decoration: none;
-        display: block;
-        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.8);
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        font-size: 16px;
+        margin-bottom: 8px;
+        border-left: 3px solid transparent;
       }
 
       .menu-item:hover {
-        background-color: var(--table-header-bg-color);
+        background: rgba(13, 77, 60, 0.3);
+        color: white;
+        border-left-color: rgba(20, 184, 166, 0.6);
+        padding-left: 24px;
+      }
+
+      .menu-item:active {
+        transform: scale(0.98);
       }
 
       /* Add styles for hiding and showing content */
@@ -953,90 +1631,320 @@
         color: green;
       }
 
-      /* Player Profile Styles */
+      /* ========================================
+         PLAYER PROFILE - GLASSMORPHISM REDESIGN
+         ======================================== */
+
       .profile-container {
-        padding: 20px;
-        max-width: 800px;
+        max-width: 1200px;
         margin: 0 auto;
-        background-color: rgba(69, 69, 69, 0.5);
-        border-radius: 10px;
+        padding: var(--spacing-8) var(--spacing-4);
       }
 
-      .player-details {
+      /* Hero Section */
+      .profile-hero {
         text-align: center;
-        margin-bottom: 30px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        padding: var(--spacing-12) var(--spacing-8);
+        margin-bottom: var(--spacing-10);
+        background: var(--glass-bg-light);
+        backdrop-filter: blur(var(--blur-lg));
+        -webkit-backdrop-filter: blur(var(--blur-lg));
+        border: var(--border-glass);
+        border-radius: 24px;
+        position: relative;
+        animation: cardFadeIn 0.6s ease;
       }
 
-      .player-details img {
-        width: 100px;
-        height: 60px;
-        margin-bottom: 10px;
+      .profile-flag {
+        width: 120px;
+        height: 80px;
+        margin: 0 auto var(--spacing-4);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        object-fit: cover;
+        position: relative;
+        z-index: 1;
+        border: 2px solid rgba(255, 255, 255, 0.2);
       }
 
-      .player-details h1 {
+      .profile-name {
+        font-size: var(--text-4xl);
+        font-weight: var(--font-extrabold);
+        font-family: var(--font-display);
+        color: var(--text-primary);
         margin: 0;
-        color: var(--text-color);
-        display: inline-block;
-        font-size: 2em;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 1;
+        letter-spacing: 1px;
       }
 
-      .stats {
+      /* Achievement Badges */
+      .achievement-badges {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-3);
+        margin-top: var(--spacing-5);
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+      }
+
+      .achievement-badge {
+        padding: var(--spacing-2) var(--spacing-4);
+        background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(20, 184, 166, 0.1));
+        border: 1px solid rgba(20, 184, 166, 0.4);
+        border-radius: 20px;
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        color: rgba(20, 184, 166, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-2);
+        animation: badgePop 0.5s ease backwards;
+      }
+
+      .achievement-badge:nth-child(1) { animation-delay: 0.1s; }
+      .achievement-badge:nth-child(2) { animation-delay: 0.2s; }
+      .achievement-badge:nth-child(3) { animation-delay: 0.3s; }
+
+      /* Stats Grid */
+      .stats-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        padding: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-6);
+        margin-bottom: var(--spacing-8);
       }
 
       .stat-card {
-        background-color: rgba(51, 51, 51, 0.8);
-        border-radius: 8px;
-        padding: 15px;
+        background: var(--glass-bg-medium);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        border: var(--border-glass);
+        border-radius: 20px;
+        padding: var(--spacing-6);
         text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        animation: cardFadeIn 0.5s ease backwards;
       }
 
-      .stat-card h2 {
-        margin: 0 0 10px 0;
-        font-size: 0.9em;
-        color: #999;
-        font-weight: normal;
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        border-color: rgba(20, 184, 166, 0.3);
+      }
+
+      .stat-label {
+        font-size: var(--text-sm);
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: var(--spacing-3);
+        font-weight: var(--font-semibold);
       }
 
       .stat-value {
-        font-size: 2em;
-        font-weight: bold;
-        color: white;
-      }
-
-      .full-width {
-        grid-column: 1 / -1;
-        margin-top: 10px;
-      }
-
-      .match-history-button {
+        font-size: var(--text-4xl);
+        font-weight: var(--font-extrabold);
+        font-family: var(--font-display);
+        color: rgba(20, 184, 166, 1);
+        text-shadow: 0 2px 8px rgba(20, 184, 166, 0.5);
         display: block;
-        margin: 20px auto 0;
-        padding: 10px 20px;
-        background-color: var(--table-header-bg-color);
-        border: none;
-        border-radius: 5px;
-        color: var(--text-color);
-        cursor: pointer;
-        font-size: 1.1em;
-        text-decoration: none;
+        line-height: 1.2;
+      }
+
+      /* Charts Section */
+      .charts-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: var(--spacing-6);
+        margin-bottom: var(--spacing-8);
+      }
+
+      .chart-card {
+        background: var(--glass-bg-light);
+        backdrop-filter: blur(var(--blur-lg));
+        -webkit-backdrop-filter: blur(var(--blur-lg));
+        border: var(--border-glass);
+        border-radius: 24px;
+        padding: var(--spacing-8);
+        animation: cardFadeIn 0.6s ease backwards;
+      }
+
+      .chart-card h3 {
+        font-size: var(--text-xl);
+        font-weight: var(--font-bold);
+        font-family: var(--font-display);
+        color: var(--text-primary);
+        margin: 0 0 var(--spacing-8) 0;
         text-align: center;
-        width: fit-content;
+      }
+
+      .chart-canvas {
+        width: 100% !important;
+        height: 300px !important;
+      }
+
+      /* Top Breaks Visual */
+      .top-breaks-section {
+        margin-bottom: var(--spacing-8);
+      }
+
+      .top-breaks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: var(--spacing-4);
+      }
+
+      .top-break-item {
+        background: var(--glass-bg-medium);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        border: var(--border-glass);
+        border-radius: 16px;
+        padding: var(--spacing-5);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        animation: cardFadeIn 0.5s ease backwards;
+      }
+
+      /* Subtle pulse only for top 3 */
+      .top-break-item:nth-child(1),
+      .top-break-item:nth-child(2),
+      .top-break-item:nth-child(3) {
+        animation: cardFadeIn 0.5s ease backwards, subtlePulse 3s ease-in-out infinite;
+      }
+
+      @keyframes subtlePulse {
+        0%, 100% {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        50% {
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+      }
+
+      .top-break-item:hover {
+        transform: translateY(-4px);
+        border-color: rgba(20, 184, 166, 0.4);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      }
+
+      .top-break-rank {
+        font-size: var(--text-xs);
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-2);
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .top-break-value {
+        font-size: var(--text-3xl);
+        font-weight: var(--font-extrabold);
+        font-family: var(--font-display);
+        color: var(--text-primary);
+        position: relative;
+        z-index: 1;
+      }
+
+      .top-break-item:nth-child(1) {
+        border-color: rgba(255, 215, 0, 0.4);
+      }
+
+      .top-break-item:nth-child(1) .top-break-value {
+        color: #ffd700;
+        text-shadow: 0 2px 12px rgba(255, 215, 0, 0.6);
+      }
+
+      .top-break-item:nth-child(2) {
+        border-color: rgba(192, 192, 192, 0.4);
+      }
+
+      .top-break-item:nth-child(2) .top-break-value {
+        color: #c0c0c0;
+        text-shadow: 0 2px 12px rgba(192, 192, 192, 0.6);
+      }
+
+      .top-break-item:nth-child(3) {
+        border-color: rgba(205, 127, 50, 0.4);
+      }
+
+      .top-break-item:nth-child(3) .top-break-value {
+        color: #cd7f32;
+        text-shadow: 0 2px 12px rgba(205, 127, 50, 0.6);
+      }
+
+      /* Match History Button */
+      .match-history-button {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-3);
+        margin: var(--spacing-8) auto 0;
+        padding: var(--spacing-4) var(--spacing-8);
+        background: linear-gradient(135deg, rgba(20, 184, 166, 0.3), rgba(20, 184, 166, 0.2));
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        border: 2px solid rgba(20, 184, 166, 0.5);
+        border-radius: 16px;
+        color: var(--text-primary);
+        font-size: var(--text-lg);
+        font-weight: var(--font-bold);
+        font-family: var(--font-display);
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(20, 184, 166, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .match-history-button::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .match-history-button:hover::before {
+        opacity: 1;
       }
 
       .match-history-button:hover {
-        background-color: #444;
+        transform: translateY(-4px) scale(1.05);
+        border-color: rgba(20, 184, 166, 0.8);
+        box-shadow: 0 8px 32px rgba(20, 184, 166, 0.4);
       }
 
+      .match-history-button svg {
+        transition: transform 0.3s ease;
+      }
+
+      .match-history-button:hover svg {
+        transform: translateX(4px);
+      }
+
+      /* Mobile Responsive */
       @media (max-width: 768px) {
-        .stats {
+        .stats-grid {
           grid-template-columns: 1fr;
+        }
+
+        .charts-section {
+          grid-template-columns: 1fr;
+        }
+
+        .top-breaks-grid {
+          grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        }
+
+        .profile-name {
+          font-size: var(--text-3xl);
         }
       }
 
@@ -1075,21 +1983,346 @@
 
       .selector-container {
         text-align: center;
-        margin: 20px auto;
+        margin: var(--spacing-8) auto;
         width: 90%;
-        max-width: 300px;
+        max-width: 360px;
         position: relative;
       }
 
       #breaks-period-selector {
-        padding: 8px 16px;
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-        background-color: var(--background-color);
-        color: var(--text-color);
-        font-size: 1em;
+        padding: var(--spacing-4) var(--spacing-6);
+        border-radius: 16px;
+        border: var(--border-glass);
+        background: var(--glass-bg-medium);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        color: var(--text-primary);
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
         width: 100%;
         box-sizing: border-box;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      #breaks-period-selector:hover {
+        border-color: rgba(20, 184, 166, 0.4);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px);
+      }
+
+      #breaks-period-selector:focus {
+        outline: none;
+        border-color: rgba(20, 184, 166, 0.6);
+        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1), 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Historical Breaks Table Styling - Sleek Dark Theme */
+      #historical-breaks-container {
+        background: linear-gradient(135deg, rgba(15, 15, 20, 0.95), rgba(20, 20, 28, 0.98));
+        backdrop-filter: blur(var(--blur-lg));
+        -webkit-backdrop-filter: blur(var(--blur-lg));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: var(--spacing-8);
+        margin: var(--spacing-6) auto;
+        max-width: 1400px;
+        overflow-x: auto;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+
+      #leaderboard-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+      }
+
+      #leaderboard-table thead tr {
+        background: rgba(20, 20, 28, 0.6);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+      }
+
+      #leaderboard-table th {
+        padding: var(--spacing-5) var(--spacing-6);
+        text-align: left;
+        font-weight: var(--font-bold);
+        font-size: var(--text-sm);
+        color: rgba(160, 160, 180, 1);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border: none;
+        background: transparent;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      #leaderboard-table tbody tr {
+        background: linear-gradient(90deg, rgba(20, 20, 28, 0.4), rgba(25, 25, 35, 0.5));
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+      }
+
+      #leaderboard-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(30, 35, 45, 0.6), rgba(35, 40, 50, 0.7));
+        transform: translateX(6px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(20, 184, 166, 0.2);
+      }
+
+      #leaderboard-table td {
+        padding: var(--spacing-5) var(--spacing-6);
+        border: none;
+        color: rgba(180, 180, 200, 1);
+        font-size: var(--text-base);
+      }
+
+      #leaderboard-table td:first-child {
+        font-weight: var(--font-bold);
+        color: rgba(220, 220, 240, 1);
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+      }
+
+      #leaderboard-table td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+      }
+
+      #leaderboard-table td:first-child a {
+        color: rgba(220, 220, 240, 1);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      #leaderboard-table td:first-child a:hover {
+        color: rgba(20, 184, 166, 1);
+      }
+
+      /* Break Badges - Medal System */
+      .break-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: var(--text-sm);
+        font-weight: var(--font-bold);
+        font-family: var(--font-display);
+        margin: 3px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        white-space: nowrap;
+        letter-spacing: 0.5px;
+      }
+
+      .break-badge:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.15);
+      }
+
+      /* Grey - Below 50 */
+      .break-badge.grey {
+        background: rgba(40, 40, 45, 0.7);
+        color: rgba(140, 140, 150, 0.9);
+        border-color: rgba(70, 70, 80, 0.6);
+      }
+
+      /* Bronze - 50-74 */
+      .break-badge.bronze {
+        background: linear-gradient(135deg, rgba(90, 60, 40, 0.9), rgba(75, 50, 30, 0.95));
+        color: rgba(230, 180, 130, 1);
+        border-color: rgba(140, 100, 70, 0.8);
+        box-shadow: 0 2px 10px rgba(90, 60, 40, 0.5);
+      }
+
+      /* Silver - 75-99 */
+      .break-badge.silver {
+        background: linear-gradient(135deg, rgba(70, 75, 80, 0.9), rgba(55, 60, 65, 0.95));
+        color: rgba(220, 230, 240, 1);
+        border-color: rgba(130, 140, 150, 0.8);
+        box-shadow: 0 2px 12px rgba(70, 75, 80, 0.6), 0 0 16px rgba(220, 230, 240, 0.15);
+      }
+
+      /* Gold - 100+ with animation */
+      .break-badge.gold {
+        background: linear-gradient(135deg, rgba(80, 65, 25, 1), rgba(100, 80, 30, 1));
+        color: rgba(255, 245, 200, 1);
+        border-color: rgba(200, 170, 80, 0.9);
+        box-shadow: 0 3px 16px rgba(200, 170, 80, 0.5), 0 0 20px rgba(255, 245, 200, 0.2);
+        font-weight: var(--font-extrabold);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .break-badge.gold::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 245, 200, 0.15) 50%,
+          transparent 70%
+        );
+        animation: goldShine 3s ease-in-out infinite;
+      }
+
+      @keyframes goldShine {
+        0%, 100% { transform: translate(-50%, -50%) rotate(0deg); opacity: 0; }
+        50% { transform: translate(50%, 50%) rotate(0deg); opacity: 1; }
+      }
+
+      .break-badges-container {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+        align-items: center;
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: var(--spacing-2);
+        /* Smooth scrolling */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Custom scrollbar for break badges */
+      .break-badges-container::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .break-badges-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+
+      .break-badges-container::-webkit-scrollbar-thumb {
+        background: rgba(20, 184, 166, 0.4);
+        border-radius: 3px;
+        transition: background 0.3s ease;
+      }
+
+      .break-badges-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(20, 184, 166, 0.6);
+      }
+
+      @media (max-width: 768px) {
+        .break-badges-container {
+          gap: 4px;
+        }
+
+        .break-badge {
+          padding: 6px 10px;
+          font-size: 0.75rem;
+          margin: 2px;
+        }
+
+        #historical-breaks-container {
+          padding: var(--spacing-4);
+        }
+
+        #leaderboard-table td {
+          padding: var(--spacing-3) var(--spacing-4);
+          font-size: var(--text-sm);
+        }
+
+        .historical-breaks-header {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: var(--spacing-6) 0 var(--spacing-4) 0;
+          padding: 0;
+          gap: var(--spacing-4);
+        }
+
+        .historical-breaks-header .section-title {
+          margin-bottom: 0;
+        }
+
+        #load-break-matrix-button {
+          width: 100%;
+          max-width: 300px;
+          text-align: center;
+          padding: var(--spacing-3) var(--spacing-4);
+          font-size: 0.875rem;
+          margin: var(--spacing-4) auto;
+        }
+
+        #load-break-matrix-button:hover {
+          transform: translateY(-2px);
+        }
+      }
+
+      /* Break Matrix Styling */
+      #break-matrix-container {
+        background: var(--glass-bg-light);
+        backdrop-filter: blur(var(--blur-lg));
+        -webkit-backdrop-filter: blur(var(--blur-lg));
+        border: var(--border-glass);
+        border-radius: 24px;
+        padding: var(--spacing-8);
+        margin: var(--spacing-8) auto;
+        max-width: 1400px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        animation: cardFadeIn 0.6s ease;
+      }
+
+      #break-matrix-container h3 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-bold);
+        font-family: var(--font-display);
+        color: var(--text-primary);
+        margin: 0 0 var(--spacing-6) 0;
+        text-align: center;
+      }
+
+      #break-matrix-chart {
+        width: 100% !important;
+        height: 600px !important;
+      }
+
+      /* Historical breaks header */
+      .historical-breaks-header {
+        margin: var(--spacing-8) 0 var(--spacing-4) 0;
+        padding: 0 var(--spacing-4);
+      }
+
+      .historical-breaks-header .section-title {
+        margin: 0;
+        text-align: center;
+      }
+
+      #load-break-matrix-button {
+        display: block;
+        margin: var(--spacing-6) auto;
+        padding: var(--spacing-3) var(--spacing-6);
+        background: linear-gradient(135deg, rgba(20, 184, 166, 0.8), rgba(20, 184, 166, 0.6));
+        border: 2px solid rgba(20, 184, 166, 0.4);
+        border-radius: 12px;
+        color: white;
+        font-size: var(--text-sm);
+        font-weight: var(--font-bold);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        white-space: nowrap;
+      }
+
+      #load-break-matrix-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+        background: linear-gradient(135deg, rgba(20, 184, 166, 0.9), rgba(20, 184, 166, 0.7));
+        border-color: rgba(20, 184, 166, 0.6);
+      }
+
+      #load-break-matrix-button:active {
+        transform: translateY(0);
       }
 
       /* Mobile specific styles */
@@ -1400,49 +2633,13 @@
   </script>
 
   <body>
-    <!-- Snooker Cue Ball Page Transition Overlay -->
-    <div id="cue-ball-transition" class="transition-overlay">
-      <svg id="transition-svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
-        <!-- Snooker table background -->
-        <defs>
-          <radialGradient id="ballGradient" cx="35%" cy="35%">
-            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-            <stop offset="60%" style="stop-color:#f0f0f0;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#d0d0d0;stop-opacity:1" />
-          </radialGradient>
-          <radialGradient id="ballShadow" cx="50%" cy="50%">
-            <stop offset="0%" style="stop-color:#000000;stop-opacity:0.3" />
-            <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
-          </radialGradient>
-        </defs>
-
-        <!-- Ball shadow -->
-        <ellipse id="ball-shadow" cx="600" cy="420" rx="35" ry="8" fill="url(#ballShadow)" opacity="0.5"/>
-
-        <!-- White cue ball -->
-        <circle id="cue-ball" cx="600" cy="400" r="30" fill="url(#ballGradient)" stroke="#e0e0e0" stroke-width="1"/>
-
-        <!-- Ball highlight -->
-        <circle cx="585" cy="385" r="8" fill="white" opacity="0.6"/>
-
-        <!-- Cue stick -->
-        <g id="cue-stick">
-          <defs>
-            <linearGradient id="cueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#8b4513;stop-opacity:1" />
-              <stop offset="70%" style="stop-color:#a0522d;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#deb887;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          <rect x="200" y="395" width="350" height="10" rx="5" fill="url(#cueGradient)"/>
-          <circle cx="205" cy="400" r="6" fill="#f5f5dc"/>
-        </g>
-      </svg>
-    </div>
-
     <div class="container">
       <div class="header">
-        <div class="burger-menu">☰</div>
+        <div class="burger-menu">
+          <div class="burger-line"></div>
+          <div class="burger-line"></div>
+          <div class="burger-line"></div>
+        </div>
         <h2 id="pageTitle" class="page-title">Daily Breaks</h2>
         <div class="menu-content" id="burgerMenuContent">
           <a href="?tab=breaks" class="menu-item">Breaks</a>
@@ -1452,12 +2649,28 @@
 
       <!-- Breaks Content -->
       <div id="breaksContent">
-        <div class="table-container">
-          <div class="date-selector">
-            <button id="prev-date">&lt;</button>
-            <input type="date" id="current-date" />
-            <button id="next-date">&gt;</button>
-          </div>
+        <!-- Date Selector with Glass Effect -->
+        <div class="date-selector-glass">
+          <button id="prev-date" class="date-nav-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <input type="date" id="current-date" class="date-input-glass" />
+          <button id="next-date" class="date-nav-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Player Cards Grid -->
+        <div id="breaks-cards-grid" class="breaks-grid">
+          <!-- Cards will be dynamically inserted here -->
+        </div>
+
+        <!-- Keep old table hidden for fallback -->
+        <div class="table-container" style="display: none;">
           <table id="breaks-table">
             <thead>
               <tr>
@@ -1471,13 +2684,16 @@
           </table>
         </div>
         <hr />
-        <h2 class="page-title">Historical Breaks</h2>
+        <div class="historical-breaks-header">
+          <h2 class="section-title">Historical Breaks</h2>
+        </div>
         <div class="selector-container">
           <select id="breaks-period-selector">
             <option value="all-time">All-time</option>
             <!-- Years will be populated here -->
           </select>
         </div>
+        <button id="load-break-matrix-button">Show breaks matrix</button>
         <div class="table-container" id="historical-breaks-container">
           <table id="leaderboard-table">
             <thead>
@@ -1491,15 +2707,14 @@
             </tbody>
           </table>
         </div>
-        <div style="text-align: center; margin: 20px">
-          <button id="load-break-matrix-button">Show breaks matrix</button>
+
+        <div id="break-matrix-container" style="display: none">
+          <h3>📊 Breaks Matrix - Top 15 Players</h3>
+          <canvas id="break-matrix-chart"></canvas>
         </div>
 
-        <div
-          class="table-container"
-          id="break-matrix-container"
-          style="display: none; overflow-x: auto"
-        >
+        <!-- Hidden old table for backward compatibility -->
+        <div style="display: none">
           <table id="break-matrix-table" style="width: auto">
             <thead>
               <tr>
@@ -1597,6 +2812,14 @@
     </div>
 
     <script>
+      // Global chart variables
+      let dailyBreakChart = null;
+      let breakMatrixChart = null;
+      let winRateChart = null;
+
+      // Global variable to store top 3 breaks across all players
+      let globalTop3Breaks = [];
+
       // TODO: remove hidden
       const videoCameraSVG = `
         <svg class="video-camera-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1670,138 +2893,33 @@
           }
         }
 
-        // ========================================
-        // SNOOKER CUE BALL TRANSITION ANIMATION
-        // ========================================
-
-        let isTransitionPlaying = false;
-
-        function playCueBallTransition(callback) {
-          // Check if anime.js is loaded
-          if (typeof anime === 'undefined') {
-            console.warn('anime.js not loaded, skipping transition');
-            if (callback) callback();
-            return;
-          }
-
-          if (isTransitionPlaying) {
-            if (callback) callback();
-            return;
-          }
-          isTransitionPlaying = true;
-
-          const overlay = document.getElementById('cue-ball-transition');
-          const cueStick = document.getElementById('cue-stick');
-          const cueBall = document.getElementById('cue-ball');
-          const ballShadow = document.getElementById('ball-shadow');
-
-          if (!overlay || !cueStick || !cueBall || !ballShadow) {
-            console.warn('Transition elements not found, skipping animation');
-            isTransitionPlaying = false;
-            if (callback) callback();
-            return;
-          }
-
-          // Show overlay
-          overlay.classList.add('active');
-
-          // Create timeline for the animation
-          const timeline = anime.timeline({
-            easing: 'easeInOutQuad',
-            complete: () => {
-              // Hide overlay with fade
-              overlay.classList.remove('active');
-              isTransitionPlaying = false;
-
-              // Execute callback after transition completes
-              if (callback) setTimeout(callback, 300);
-            }
-          });
-
-          // Phase 1: Cue stick enters from left (0-400ms)
-          timeline.add({
-            targets: cueStick,
-            translateX: ['-200px', '0px'],
-            duration: 400,
-            easing: 'easeOutQuad'
-          });
-
-          // Phase 2: Cue pulls back slightly before strike (400-600ms)
-          timeline.add({
-            targets: cueStick,
-            translateX: [0, -30],
-            duration: 200,
-            easing: 'easeInQuad'
-          }, 400);
-
-          // Phase 3: Cue strikes with force (600-750ms)
-          timeline.add({
-            targets: cueStick,
-            translateX: [-30, 50],
-            duration: 150,
-            easing: 'easeOutCubic'
-          }, 600);
-
-          // Camera shake on impact (600-700ms)
-          timeline.add({
-            targets: '#transition-svg',
-            translateX: [0, -5, 5, -3, 3, 0],
-            duration: 100,
-            easing: 'easeOutQuad'
-          }, 600);
-
-          // Phase 4: Ball rolls off screen with physics (750-1500ms)
-          timeline.add({
-            targets: cueBall,
-            translateX: [0, 800],
-            rotate: [0, 720],
-            duration: 750,
-            easing: 'easeInQuad'
-          }, 750);
-
-          // Shadow follows ball
-          timeline.add({
-            targets: ballShadow,
-            translateX: [0, 800],
-            scaleX: [1, 0.6],
-            opacity: [0.5, 0.1],
-            duration: 750,
-            easing: 'easeInQuad'
-          }, 750);
-
-          // Phase 5: Cue stick exits (900-1200ms)
-          timeline.add({
-            targets: cueStick,
-            translateX: [50, 800],
-            opacity: [1, 0],
-            duration: 300,
-            easing: 'easeInQuad'
-          }, 900);
-
-          // Reset positions after animation completes
-          setTimeout(() => {
-            anime.set(cueStick, { translateX: 0, opacity: 1 });
-            anime.set(cueBall, { translateX: 0, rotate: 0 });
-            anime.set(ballShadow, { translateX: 0, scaleX: 1, opacity: 0.5 });
-          }, 1600);
-        }
-
         handleTabSwitching();
         setupAutoRefreshIfLiveScores();
 
-        // Add animation to menu navigation
+        // Add 3D breakoff animation to menu navigation
         document.querySelectorAll('.menu-item').forEach(link => {
           link.addEventListener('click', (e) => {
-            // Only animate if not initial load and if going to a different tab
+            // Only animate if going to a different tab
             const currentTab = new URLSearchParams(window.location.search).get('tab') || 'breaks';
             const targetUrl = new URL(link.href, window.location.origin);
             const targetTab = new URLSearchParams(targetUrl.search).get('tab') || 'breaks';
 
             if (currentTab !== targetTab) {
               e.preventDefault();
-              playCueBallTransition(() => {
-                window.location.href = link.href;
-              });
+              // Navigate immediately without blocking on animation
+              // This allows the new page to load while animation plays
+              const targetUrl = link.href;
+
+              // Mark that we're navigating (to prevent double animation)
+              sessionStorage.setItem('isNavigating', 'true');
+
+              // Start animation
+              window.playBreakoffTransition();
+
+              // Navigate after a short delay to allow animation to start
+              setTimeout(() => {
+                window.location.href = targetUrl;
+              }, 100);
             }
           });
         });
@@ -1873,24 +2991,33 @@
         document
           .getElementById("load-break-matrix-button")
           .addEventListener("click", async function () {
-            const container = document.getElementById("break-matrix-container");
+            const matrixContainer = document.getElementById("break-matrix-container");
+            const historicalContainer = document.getElementById("historical-breaks-container");
+            const selectorContainer = document.querySelector(".selector-container");
             const button = document.getElementById("load-break-matrix-button");
 
-            // Toggle display
-            if (container.style.display === "none") {
+            // Toggle between historical breaks and matrix
+            if (matrixContainer.style.display === "none") {
               try {
                 const response = await fetch(
                   "http://localhost:3000/breaks-matrix"
                 );
                 const { data } = await response.json();
-                populateBreakMatrix(data);
-                container.style.display = "block";
-                button.textContent = "Hide breaks matrix";
+                createBreakMatrixChart(data);
+
+                // Show matrix, hide historical breaks
+                matrixContainer.style.display = "block";
+                historicalContainer.style.display = "none";
+                selectorContainer.style.display = "none";
+                button.textContent = "Show historical breaks";
               } catch (e) {
                 console.error("Failed to load break matrix:", e);
               }
             } else {
-              container.style.display = "none";
+              // Show historical breaks, hide matrix
+              matrixContainer.style.display = "none";
+              historicalContainer.style.display = "block";
+              selectorContainer.style.display = "block";
               button.textContent = "Show breaks matrix";
             }
           });
@@ -2002,7 +3129,355 @@
             .catch((error) => console.error("Error fetching data:", error));
         }
 
+        // ========================================
+        // DAILY BREAKS - CARD RENDERING
+        // ========================================
+
+        function getBreakColor(breakValue) {
+          // Check if this break is in the global top 3
+          const breakIndex = globalTop3Breaks.indexOf(breakValue);
+          if (breakIndex === 0) return 'break-gold';
+          if (breakIndex === 1) return 'break-silver';
+          if (breakIndex === 2) return 'break-bronze';
+
+          // Default grey for all other breaks
+          return 'break-grey';
+        }
+
+        function createPlayerCard(player, index, playerRank = null) {
+          const playerName = player.name || player.playerName;
+          const breaksArray = Array.isArray(player.highbreaks)
+            ? player.highbreaks
+            : typeof player.highbreaks === 'string'
+            ? player.highbreaks.split(',').map(b => parseInt(b.trim())).filter(b => b > 0)
+            : [];
+
+          const highestBreak = breaksArray.length > 0 ? Math.max(...breaksArray) : 0;
+          const breakCount = breaksArray.length;
+          const avgBreak = breaksArray.length > 0
+            ? Math.round(breaksArray.reduce((a, b) => a + b, 0) / breaksArray.length)
+            : 0;
+
+          const card = document.createElement('div');
+          card.className = 'player-break-card';
+          card.style.animationDelay = `${index * 0.1}s`;
+
+          card.innerHTML = `
+            <div class="card-player-header">
+              <img
+                src="https://roundrobin.ch/IMAGES/Flags/GIF/128/${player.nationality || 'CH'}.gif"
+                class="player-flag-card"
+                alt="${player.nationality || 'CH'}"
+                onerror="this.style.display='none'"
+              />
+              <a href="?tab=profile&name=${encodeURIComponent(playerName)}" class="player-name-card">
+                ${playerName}
+              </a>
+            </div>
+
+            <div class="card-stats-summary">
+              <div class="stat-item-small">
+                <span class="stat-label-small">High</span>
+                <span class="stat-value-small">${highestBreak}</span>
+              </div>
+              <div class="stat-item-small">
+                <span class="stat-label-small">Count</span>
+                <span class="stat-value-small">${breakCount}</span>
+              </div>
+              <div class="stat-item-small">
+                <span class="stat-label-small">Avg</span>
+                <span class="stat-value-small">${avgBreak}</span>
+              </div>
+            </div>
+
+            <div class="breaks-badges" id="breaks-${index}">
+              <!-- Badges will be added here -->
+            </div>
+          `;
+
+          // Add break badges after card is in DOM using innerHTML instead of appendChild
+          setTimeout(() => {
+            const badgesContainer = card.querySelector(`#breaks-${index}`);
+            if (!badgesContainer) {
+              console.error(`Badges container not found for index ${index}`);
+              return;
+            }
+
+            const sortedBreaks = breaksArray.sort((a, b) => b - a);
+
+            // Build HTML string for all badges at once
+            const badgesHTML = sortedBreaks
+              .map((breakValue, badgeIndex) => {
+                const numValue = parseInt(breakValue);
+                if (isNaN(numValue) || numValue < 0) return '';
+
+                const colorClass = getBreakColor(numValue);
+                const delay = badgeIndex * 0.05;
+                return `<span class="break-badge ${colorClass}" style="animation-delay: ${delay}s">${numValue}</span>`;
+              })
+              .join('');
+
+            // Set all badges at once
+            badgesContainer.innerHTML = badgesHTML;
+          }, 100 + (index * 100));
+
+          return card;
+        }
+
+        function renderBreaksAsCards(data) {
+          const cardsGrid = document.getElementById('breaks-cards-grid');
+          const chartContainer = document.querySelector('.chart-container');
+          cardsGrid.innerHTML = '';
+
+          if (!Array.isArray(data) || data.length === 0) {
+            // Hide chart when no data
+            if (chartContainer) {
+              chartContainer.style.display = 'none';
+            }
+
+            // Show beautiful empty state with red triangle
+            cardsGrid.innerHTML = `
+              <div class="empty-state">
+                <div class="red-triangle-container">
+                  <div style="display: flex; gap: 6px;">
+                    <div class="red-ball"></div>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                    <div class="red-ball"></div>
+                  </div>
+                </div>
+                <h3 class="empty-state-title">No Breaks Recorded</h3>
+                <p class="empty-state-message">
+                  Try selecting a different date to view player statistics.
+                </p>
+              </div>
+            `;
+            return;
+          }
+
+          // Show chart when data exists
+          if (chartContainer) {
+            chartContainer.style.display = 'block';
+          }
+
+          // Collect all breaks from all players
+          const allBreaks = [];
+          data.forEach(player => {
+            const breaksArray = Array.isArray(player.highbreaks)
+              ? player.highbreaks
+              : typeof player.highbreaks === 'string'
+              ? player.highbreaks.split(',').map(b => parseInt(b.trim())).filter(b => b > 0)
+              : [];
+            allBreaks.push(...breaksArray);
+          });
+
+          // Sort all breaks in descending order and get top 3 unique values
+          const uniqueBreaks = [...new Set(allBreaks)].sort((a, b) => b - a);
+          globalTop3Breaks = uniqueBreaks.slice(0, 3);
+
+          // Sort players by highest break for ranking
+          const sortedData = [...data].sort((a, b) => {
+            const breaksA = Array.isArray(a.highbreaks) ? a.highbreaks : a.highbreaks.split(',').map(b => parseInt(b.trim())).filter(b => b > 0);
+            const breaksB = Array.isArray(b.highbreaks) ? b.highbreaks : b.highbreaks.split(',').map(b => parseInt(b.trim())).filter(b => b > 0);
+            const maxA = breaksA.length > 0 ? Math.max(...breaksA) : 0;
+            const maxB = breaksB.length > 0 ? Math.max(...breaksB) : 0;
+            return maxB - maxA;
+          });
+
+          sortedData.forEach((player, index) => {
+            const card = createPlayerCard(player, index, null);
+            cardsGrid.appendChild(card);
+          });
+        }
+
+        function createDailyBreakChart(data) {
+          const canvas = document.getElementById('daily-break-chart');
+          if (!canvas) {
+            console.error('Chart canvas not found');
+            return;
+          }
+
+          // Check if Chart.js is loaded
+          if (typeof Chart === 'undefined') {
+            console.error('Chart.js not loaded');
+            return;
+          }
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            console.error('Could not get canvas context');
+            return;
+          }
+
+          // Destroy existing chart
+          if (dailyBreakChart) {
+            dailyBreakChart.destroy();
+            dailyBreakChart = null;
+          }
+
+          // Count breaks by range
+          const breakRanges = {
+            '< 20': 0,
+            '20-49': 0,
+            '50-69': 0,
+            '70-99': 0,
+            '100+': 0
+          };
+
+          data.forEach(player => {
+            const breaksArray = Array.isArray(player.highbreaks)
+              ? player.highbreaks
+              : typeof player.highbreaks === 'string'
+              ? player.highbreaks.split(',').map(b => parseInt(b.trim())).filter(b => b > 0)
+              : [];
+
+            breaksArray.forEach(breakValue => {
+              if (breakValue >= 100) breakRanges['100+']++;
+              else if (breakValue >= 70) breakRanges['70-99']++;
+              else if (breakValue >= 50) breakRanges['50-69']++;
+              else if (breakValue >= 20) breakRanges['20-49']++;
+              else breakRanges['< 20']++;
+            });
+          });
+
+          console.log('Break ranges:', breakRanges);
+
+          try {
+            dailyBreakChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: Object.keys(breakRanges),
+                datasets: [{
+                  label: 'Number of Breaks',
+                  data: Object.values(breakRanges),
+                backgroundColor: [
+                  'rgba(156, 163, 175, 0.9)',
+                  'rgba(96, 165, 250, 0.9)',
+                  'rgba(167, 139, 250, 0.9)',
+                  'rgba(251, 191, 36, 0.9)',
+                  'rgba(255, 215, 0, 0.9)'
+                ],
+                borderColor: [
+                  'rgba(156, 163, 175, 1)',
+                  'rgba(96, 165, 250, 1)',
+                  'rgba(167, 139, 250, 1)',
+                  'rgba(251, 191, 36, 1)',
+                  'rgba(255, 215, 0, 1)'
+                ],
+                borderWidth: 2,
+                borderRadius: 12
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                  titleColor: '#fff',
+                  bodyColor: '#fff',
+                  borderColor: 'rgba(20, 184, 166, 0.5)',
+                  borderWidth: 2,
+                  padding: 16,
+                  displayColors: false,
+                  titleFont: {
+                    size: 16,
+                    weight: 'bold'
+                  },
+                  bodyFont: {
+                    size: 14
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    font: {
+                      size: 14,
+                      weight: 'bold'
+                    },
+                    stepSize: 1,
+                    padding: 8
+                  },
+                  grid: {
+                    color: 'rgba(255, 255, 255, 0.15)',
+                    drawBorder: false,
+                    lineWidth: 1
+                  },
+                  border: {
+                    display: false
+                  }
+                },
+                x: {
+                  ticks: {
+                    color: 'rgba(255, 255, 255, 1)',
+                    font: {
+                      size: 15,
+                      weight: 'bold'
+                    },
+                    padding: 8
+                  },
+                  grid: {
+                    display: false
+                  },
+                  border: {
+                    display: false
+                  }
+                }
+              }
+            }
+          });
+          console.log('Chart created successfully:', dailyBreakChart);
+          } catch (error) {
+            console.error('Error creating chart:', error);
+          }
+        }
+
+        // Helper function to get break color class (Medal System)
+        function getBreakColorClass(breakValue) {
+          if (breakValue >= 100) return 'gold';
+          if (breakValue >= 75) return 'silver';
+          if (breakValue >= 50) return 'bronze';
+          return 'grey';
+        }
+
+        // Helper function to create break badge HTML
+        function createBreakBadge(breakValue) {
+          const colorClass = getBreakColorClass(breakValue);
+          return `<span class="break-badge ${colorClass}">${breakValue}</span>`;
+        }
+
         function updateTable(tableId, data, isHistorical = false) {
+          // For daily breaks, use card rendering instead
+          if (tableId === 'breaks-table' && !isHistorical) {
+            renderBreaksAsCards(data);
+            return;
+          }
+
           const tableBody = document
             .getElementById(tableId)
             .querySelector("tbody");
@@ -2017,21 +3492,29 @@
           data.forEach((player) => {
             const row = document.createElement("tr");
             const playerName = player.name || player.playerName;
+
             // Ensure breaks is always treated as an array
             const breaksArray = Array.isArray(player.highbreaks)
               ? player.highbreaks
               : typeof player.highbreaks === "string"
-              ? player.highbreaks.split(",")
+              ? player.highbreaks.split(",").map(b => parseInt(b.trim())).filter(b => b > 0)
               : [];
 
-            const breaks =
-              breaksArray.length > 0 ? breaksArray.join(", ") : "0";
+            // For historical breaks, render as visual badges
+            let breaksContent;
+            if (isHistorical && breaksArray.length > 0) {
+              // Sort breaks in descending order
+              const sortedBreaks = [...breaksArray].sort((a, b) => b - a);
+              breaksContent = `<div class="break-badges-container">${sortedBreaks.map(b => createBreakBadge(b)).join('')}</div>`;
+            } else {
+              breaksContent = breaksArray.length > 0 ? breaksArray.join(", ") : "0";
+            }
 
             row.innerHTML = `
               <td><a href="?tab=profile&name=${encodeURIComponent(
                 playerName
               )}">${playerName}</a></td>
-              <td>${breaks}</td>
+              <td>${breaksContent}</td>
             `;
             tableBody.appendChild(row);
           });
@@ -2135,7 +3618,13 @@
 
           // Check if we should show animation (not on very first page load of session)
           const hasNavigatedBefore = sessionStorage.getItem('hasNavigated');
-          const shouldAnimate = hasNavigatedBefore === 'true';
+          const isNavigating = sessionStorage.getItem('isNavigating');
+
+          // Don't animate if we just started navigating (animation already played)
+          const shouldAnimate = hasNavigatedBefore === 'true' && isNavigating !== 'true';
+
+          // Clear the navigation flag
+          sessionStorage.removeItem('isNavigating');
 
           // Mark that we've navigated at least once
           sessionStorage.setItem('hasNavigated', 'true');
@@ -2198,9 +3687,14 @@
           // Execute tab switch with or without animation
           console.log('shouldAnimate:', shouldAnimate);
           if (shouldAnimate) {
-            // Play cue ball transition animation on navigation
-            console.log('Playing cue ball transition...');
-            playCueBallTransition(executeTabSwitch);
+            // Use 3D breakoff transition - load data DURING animation
+            console.log('Playing 3D break-off animation');
+
+            // Start loading data immediately (runs in parallel with animation)
+            executeTabSwitch();
+
+            // Play animation (data loads while animation plays)
+            window.playBreakoffTransition();
           } else {
             // No animation on very first page load
             console.log('Skipping animation on first load');
@@ -2343,10 +3837,19 @@
             const formattedTime = formatDate(actionTime);
             const lastActionLabel = actionLabel + formattedTime;
 
+            // Determine match status for live indicator
+            const matchStatus = match?.winner
+              ? "ended"
+              : matchUpdatedAt < oneHourAgo
+              ? "paused"
+              : isMatchLiveOnTableNow
+              ? "active"
+              : "none";
+
             gridContainer.innerHTML += `
                           <div class="grid-item ${
                             isMatchLiveOnTableNow ? "" : "no-match"
-                          }" data-table-number="${i}">
+                          }" data-table-number="${i}" data-status="${matchStatus}">
                             <div class="grid-item-header">
                         <div class="table-number-section">
                           <span class="table-number" style="float:left;padding-left:20px;">Table ${i}</span>
@@ -2474,114 +3977,351 @@
 
         function displayPlayerProfile(playerData) {
           const profileContainer = document.querySelector(".profile-container");
-          profileContainer.innerHTML = ""; // Clear the container
+          profileContainer.innerHTML = "";
 
-          const playerDetailDiv = document.createElement("div");
-          playerDetailDiv.classList.add("player-details");
+          // Calculate win rates
+          const matchWinRate = Math.round((playerData.matchesWon / playerData.matchesCompleted) * 100);
+          const frameWinRate = Math.round((playerData.framesWon / (playerData.framesWon + playerData.framesLost)) * 100);
 
-          // Player image and name container
-          const playerImage = document.createElement("img");
-          playerImage.src = getPlayerImage(playerData.nationality);
-          playerImage.alt = "Player Nationality";
+          // Determine achievement badges
+          const badges = [];
+          if (playerData.highBreaks.some(b => b >= 100)) badges.push({ icon: '💯', label: 'Century Maker' });
+          if (playerData.matchesWon > 100) badges.push({ icon: '🏆', label: 'Champion' });
+          if (matchWinRate >= 70) badges.push({ icon: '⭐', label: 'Win Rate Master' });
 
-          const playerName = document.createElement("h1");
-          playerName.textContent = ` ${playerData.name}`;
+          profileContainer.innerHTML = `
+            <!-- Hero Section -->
+            <div class="profile-hero">
+              <img src="${getPlayerImage(playerData.nationality)}" class="profile-flag" alt="Flag" />
+              <h1 class="profile-name">${playerData.name}</h1>
 
-          playerDetailDiv.appendChild(playerImage);
-          playerDetailDiv.appendChild(playerName);
-          profileContainer.appendChild(playerDetailDiv);
+              ${badges.length > 0 ? `
+                <div class="achievement-badges">
+                  ${badges.map(badge => `
+                    <span class="achievement-badge">
+                      ${badge.icon} ${badge.label}
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
 
-          // Create stats grid
-          const stats = document.createElement("div");
-          stats.classList.add("stats");
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+              <div class="stat-card" style="animation-delay: 0.1s;">
+                <div class="stat-label">Matches Won</div>
+                <div class="stat-value" data-target="${playerData.matchesWon}">0</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.2s;">
+                <div class="stat-label">Matches Lost</div>
+                <div class="stat-value" data-target="${playerData.matchesLost}">0</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.3s;">
+                <div class="stat-label">Match Win Rate</div>
+                <div class="stat-value" data-target="${matchWinRate}" data-suffix="%">0%</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.4s;">
+                <div class="stat-label">Frames Won</div>
+                <div class="stat-value" data-target="${playerData.framesWon}">0</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.5s;">
+                <div class="stat-label">Frames Lost</div>
+                <div class="stat-value" data-target="${playerData.framesLost}">0</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.6s;">
+                <div class="stat-label">Frame Win Rate</div>
+                <div class="stat-value" data-target="${frameWinRate}" data-suffix="%">0%</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.7s;">
+                <div class="stat-label">Avg. High Break</div>
+                <div class="stat-value" data-target="${playerData.averageBreakPerMatch}">0</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.8s;">
+                <div class="stat-label">Longest Streak</div>
+                <div class="stat-value" data-target="${playerData.longestWinStreak}">0</div>
+              </div>
+              <div class="stat-card" style="animation-delay: 0.9s;">
+                <div class="stat-label">Decider Win Rate</div>
+                <div class="stat-value" data-target="${playerData.deciderWinRate}" data-suffix="%">0%</div>
+              </div>
+            </div>
 
-          const statsData = [
-            { title: "Matches Won", value: playerData.matchesWon },
-            { title: "Matches Lost", value: playerData.matchesLost },
-            {
-              title: "Match Win Rate (%)",
-              value:
-                Math.round(
-                  (playerData.matchesWon / playerData.matchesCompleted) * 100
-                ) + "%",
-            },
-            { title: "Frames Won", value: playerData.framesWon },
-            { title: "Frames Lost", value: playerData.framesLost },
-            {
-              title: "Frame Win Rate (%)",
-              value:
-                Math.round(
-                  (playerData.framesWon /
-                    (playerData.framesWon + playerData.framesLost)) *
-                    100
-                ) + "%",
-            },
-            {
-              title: "Avg. High Break Per Match",
-              value: playerData.averageBreakPerMatch,
-            },
-            {
-              title: "Matches Not Finished",
-              value: playerData.incompleteMatches,
-            },
-            {
-              title: "Decider Win Rate (%)",
-              value: playerData.deciderWinRate + "%",
-            },
-            {
-              title: "Longest Win Streak",
-              value: playerData.longestWinStreak,
-            },
-            {
-              title: "Most Frequent Opponent",
-              value: playerData.mostFrequentOpponent.opponent,
-              tooltip: `Total Matches Played: ${playerData.mostFrequentOpponent.total_matches} matches\nWins: ${playerData.mostFrequentOpponent.wins}\nWin Percentage: ${playerData.mostFrequentOpponent.win_percentage}%`,
-            },
-          ];
+            <!-- Charts Section -->
+            <div class="charts-section">
+              <div class="chart-card">
+                <h3>📊 Win Rate Analysis</h3>
+                <canvas id="win-rate-chart" class="chart-canvas"></canvas>
+              </div>
+            </div>
 
-          statsData.forEach((stat) => {
-            stats.appendChild(
-              createStatCard(stat.title, stat.value, stat.tooltip)
-            );
-          });
+            <!-- Top 10 Breaks -->
+            <div class="chart-card top-breaks-section">
+              <h3>🎯 Top 10 Highest Breaks</h3>
+              <div class="top-breaks-grid">
+                ${playerData.highBreaks.map((breakValue, index) => `
+                  <div class="top-break-item" style="--delay: ${index}; animation-delay: ${index * 0.1}s;">
+                    <div class="top-break-rank">#${index + 1}</div>
+                    <div class="top-break-value">${breakValue}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
 
-          // High breaks stat (full width)
-          const highBreaksCard = createStatCard(
-            "High Breaks (Top 10)",
-            playerData.highBreaks.join(", ")
-          );
-          highBreaksCard.classList.add("full-width");
-          stats.appendChild(highBreaksCard);
+            <!-- Match History Button -->
+            <div style="text-align: center;">
+              <a href="?tab=matches&name=${encodeURIComponent(playerData.name)}" class="match-history-button">
+                View Match History
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </a>
+            </div>
+          `;
 
-          profileContainer.appendChild(stats);
+          // Animate counters
+          setTimeout(() => animateStatCounters(), 100);
 
-          // Add Match History button
-          const matchHistoryButton = document.createElement("a");
-          matchHistoryButton.href = `?tab=matches&name=${encodeURIComponent(
-            playerData.name
-          )}`;
-          matchHistoryButton.classList.add("match-history-button");
-          matchHistoryButton.textContent = "Match History";
-          profileContainer.appendChild(matchHistoryButton);
+          // Create win rate chart
+          setTimeout(() => createWinRateChart(matchWinRate, frameWinRate, playerData.deciderWinRate), 200);
         }
 
-        function createStatCard(title, value, tooltip = "") {
-          const statCard = document.createElement("div");
-          statCard.classList.add("stat-card");
-          if (tooltip) {
-            statCard.title = tooltip;
+        function animateStatCounters() {
+          const statValues = document.querySelectorAll('.stat-value[data-target]');
+
+          statValues.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            const suffix = stat.getAttribute('data-suffix') || '';
+            const duration = 2000;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+
+              // Ease out cubic
+              const easeProgress = 1 - Math.pow(1 - progress, 3);
+              const current = Math.floor(easeProgress * target);
+
+              stat.textContent = current + suffix;
+
+              if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+              } else {
+                stat.textContent = target + suffix;
+              }
+            }
+
+            requestAnimationFrame(updateCounter);
+          });
+        }
+
+        function createWinRateChart(matchWinRate, frameWinRate, deciderWinRate) {
+          const canvas = document.getElementById('win-rate-chart');
+          if (!canvas) return;
+
+          if (typeof Chart === 'undefined') {
+            console.error('Chart.js not loaded');
+            return;
           }
 
-          const statTitle = document.createElement("h2");
-          statTitle.textContent = title;
-          statCard.appendChild(statTitle);
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
 
-          const statValue = document.createElement("div");
-          statValue.classList.add("stat-value");
-          statValue.textContent = value;
-          statCard.appendChild(statValue);
+          // Destroy existing chart
+          if (winRateChart) {
+            winRateChart.destroy();
+            winRateChart = null;
+          }
 
-          return statCard;
+          try {
+            winRateChart = new Chart(ctx, {
+              type: 'doughnut',
+              data: {
+                labels: ['Match Win Rate', 'Frame Win Rate', 'Decider Win Rate'],
+                datasets: [{
+                  data: [matchWinRate, frameWinRate, deciderWinRate],
+                  backgroundColor: [
+                    'rgba(255, 215, 0, 0.8)',
+                    'rgba(20, 184, 166, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                  ],
+                  borderColor: [
+                    'rgba(255, 215, 0, 1)',
+                    'rgba(20, 184, 166, 1)',
+                    'rgba(139, 92, 246, 1)'
+                  ],
+                  borderWidth: 2
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: {
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      font: { size: 14, weight: 'bold' },
+                      padding: 15
+                    }
+                  },
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(20, 184, 166, 0.5)',
+                    borderWidth: 2,
+                    padding: 12,
+                    callbacks: {
+                      label: function(context) {
+                        return context.label + ': ' + context.parsed + '%';
+                      }
+                    }
+                  },
+                  datalabels: {
+                    color: '#fff',
+                    font: {
+                      size: 18,
+                      weight: 'bold'
+                    },
+                    formatter: function(value, context) {
+                      return value + '%';
+                    },
+                    anchor: 'center',
+                    align: 'center',
+                    textAlign: 'center',
+                    textStrokeColor: 'rgba(0, 0, 0, 0.8)',
+                    textStrokeWidth: 3
+                  }
+                }
+              }
+            });
+          } catch (error) {
+            console.error('Error creating win rate chart:', error);
+          }
+        }
+
+        // Create Break Matrix Chart
+        function createBreakMatrixChart(data) {
+          const canvas = document.getElementById('break-matrix-chart');
+          if (!canvas) {
+            console.error('Break matrix chart canvas not found');
+            return;
+          }
+
+          if (typeof Chart === 'undefined') {
+            console.error('Chart.js not loaded');
+            return;
+          }
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            console.error('Could not get canvas context');
+            return;
+          }
+
+          // Destroy existing chart
+          if (breakMatrixChart) {
+            breakMatrixChart.destroy();
+            breakMatrixChart = null;
+          }
+
+          // Take top 15 players by total frames played
+          const topPlayers = data.slice(0, 15);
+
+          // Extract player names
+          const playerNames = topPlayers.map(p => p.player_name);
+
+          // Create datasets for each break range (ordered from lowest to highest)
+          const breakRanges = [
+            { label: '20+', key: '20+', color: 'rgba(156, 163, 175, 0.8)', borderColor: 'rgba(156, 163, 175, 1)' },
+            { label: '30+', key: '30+', color: 'rgba(59, 130, 246, 0.6)', borderColor: 'rgba(59, 130, 246, 0.8)' },
+            { label: '40+', key: '40+', color: 'rgba(59, 130, 246, 0.8)', borderColor: 'rgba(59, 130, 246, 1)' },
+            { label: '50+', key: '50+', color: 'rgba(139, 92, 246, 0.6)', borderColor: 'rgba(139, 92, 246, 0.8)' },
+            { label: '60+', key: '60+', color: 'rgba(139, 92, 246, 0.8)', borderColor: 'rgba(139, 92, 246, 1)' },
+            { label: '70+', key: '70+', color: 'rgba(234, 179, 8, 0.6)', borderColor: 'rgba(234, 179, 8, 0.8)' },
+            { label: '80+', key: '80+', color: 'rgba(251, 191, 36, 0.8)', borderColor: 'rgba(251, 191, 36, 1)' },
+            { label: '90+', key: '90+', color: 'rgba(234, 179, 8, 0.8)', borderColor: 'rgba(234, 179, 8, 1)' },
+            { label: '100+', key: '100+', color: 'rgba(255, 0, 150, 0.8)', borderColor: 'rgba(255, 0, 150, 1)' }
+          ];
+
+          const datasets = breakRanges.map(range => ({
+            label: range.label,
+            data: topPlayers.map(p => p[range.key] || 0),
+            backgroundColor: range.color,
+            borderColor: range.borderColor,
+            borderWidth: 1
+          }));
+
+          try {
+            breakMatrixChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: playerNames,
+                datasets: datasets
+              },
+              options: {
+                indexAxis: 'y', // Horizontal bars
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: {
+                    stacked: true,
+                    grid: {
+                      color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      font: { size: 12, weight: 'bold' }
+                    },
+                    title: {
+                      display: true,
+                      text: 'Number of Breaks',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      font: { size: 14, weight: 'bold' }
+                    }
+                  },
+                  y: {
+                    stacked: true,
+                    grid: {
+                      display: false
+                    },
+                    ticks: {
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      font: { size: 13, weight: 'bold' }
+                    }
+                  }
+                },
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: {
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      font: { size: 12, weight: 'bold' },
+                      padding: 12,
+                      boxWidth: 20,
+                      boxHeight: 12
+                    }
+                  },
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(20, 184, 166, 0.5)',
+                    borderWidth: 2,
+                    padding: 12,
+                    callbacks: {
+                      label: function(context) {
+                        return context.dataset.label + ': ' + context.parsed.x + ' breaks';
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          } catch (error) {
+            console.error('Error creating break matrix chart:', error);
+          }
         }
 
         // Add new function to handle match history display
@@ -2771,5 +4511,62 @@
         </iframe>
       </div>
     </div>
+
+    <!-- 3D Snooker Break-Off Transition Overlay -->
+    <div id="breakoff-transition-overlay" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      background: var(--bg-gradient-dark);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    ">
+      <iframe
+        id="breakoff-transition-iframe"
+        src=""
+        style="
+          width: 100%;
+          height: 100%;
+          border: none;
+          background: transparent;
+        "
+        loading="eager"
+      ></iframe>
+    </div>
+
+    <script>
+      // 3D Break-Off Page Transition
+      (function() {
+        const overlay = document.getElementById('breakoff-transition-overlay');
+        const iframe = document.getElementById('breakoff-transition-iframe');
+
+        function playBreakoffTransition(callback) {
+          // Load the short animation (2s duration, no controls, no loading modal)
+          // Add cache-busting parameter to ensure fresh load
+          iframe.src = 'breakoff-3d-short.html?v=' + Date.now();
+
+          // Fade in immediately
+          overlay.style.opacity = '1';
+          overlay.style.pointerEvents = 'auto';
+
+          // Fade out after 2 seconds
+          setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+              overlay.style.pointerEvents = 'none';
+              iframe.src = ''; // Unload to free resources
+              if (callback) callback();
+            }, 500);
+          }, 2000);
+        }
+
+        // Expose to window for manual trigger
+        window.playBreakoffTransition = playBreakoffTransition;
+      })();
+    </script>
   </body>
 </html>
