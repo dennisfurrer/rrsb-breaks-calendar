@@ -3000,7 +3000,7 @@
             if (matrixContainer.style.display === "none") {
               try {
                 const response = await fetch(
-                  "http://localhost:3000/breaks-matrix"
+                  "https://rrsb-scoreboard-server.onrender.com/breaks-matrix"
                 );
                 const { data } = await response.json();
                 createBreakMatrixChart(data);
@@ -3123,7 +3123,7 @@
 
         function fetchAndDisplayBreaks(date) {
           // fetch(`http://localhost:3000/breaks/${date}`)
-          fetch(`http://localhost:3000/breaks/${date}`)
+          fetch(`https://rrsb-scoreboard-server.onrender.com/breaks/${date}`)
             .then((response) => response.json())
             .then((data) => updateTable("breaks-table", data.data))
             .catch((error) => console.error("Error fetching data:", error));
@@ -3524,7 +3524,7 @@
           try {
             const response = await fetch(
               // "http://localhost:3000/breaks/leaderboard"
-              "http://localhost:3000/breaks/leaderboard"
+              "https://rrsb-scoreboard-server.onrender.com/breaks/leaderboard"
             );
             const { data } = await response.json();
             updateTable("leaderboard-table", data, true);
@@ -3545,7 +3545,7 @@
             // Fetch available years
             const yearsResponse = await fetch(
               // "http://localhost:3000/data/years"
-              "http://localhost:3000/data/years"
+              "https://rrsb-scoreboard-server.onrender.com/data/years"
             );
             const { data: years } = await yearsResponse.json();
 
@@ -3573,7 +3573,7 @@
                 } else {
                   const response = await fetch(
                     // `http://localhost:3000/breaks/year/${selectedValue}`
-                    `http://localhost:3000/breaks/year/${selectedValue}`
+                    `https://rrsb-scoreboard-server.onrender.com/breaks/year/${selectedValue}`
                   );
                   const { data } = await response.json();
                   updateTable("leaderboard-table", data, true);
@@ -3803,7 +3803,7 @@
           try {
             const response = await fetch(
               // "http://localhost:3000/api/matches/live"
-              "http://localhost:3000/api/matches/live"
+              "https://rrsb-scoreboard-server.onrender.com/api/matches/live"
             );
             const data = await response.json();
             matches = data.data || [];
@@ -3961,7 +3961,7 @@
         async function loadPlayerProfile(playerName) {
           try {
             const response = await fetch(
-              `http://localhost:3000/players/${encodeURIComponent(
+              `https://rrsb-scoreboard-server.onrender.com/players/${encodeURIComponent(
                 playerName
               )}`
             );
@@ -4369,7 +4369,7 @@
           async function loadMatches(page = 1, opponent = "") {
             try {
               const limit = 1000;
-              const url = `http://localhost:3000/matches/player/${encodeURIComponent(
+              const url = `https://rrsb-scoreboard-server.onrender.com/matches/player/${encodeURIComponent(
                 playerName
               )}?page=${page}&limit=${limit}${
                 opponent ? `&opponent=${encodeURIComponent(opponent)}` : ""
@@ -4462,7 +4462,7 @@
               if (opponentSelect && opponentSelect.options.length <= 1) {
                 try {
                   const playersResponse = await fetch(
-                    "http://localhost:3000/players"
+                    "https://rrsb-scoreboard-server.onrender.com/players"
                   );
                   const { data: players } = await playersResponse.json();
 
