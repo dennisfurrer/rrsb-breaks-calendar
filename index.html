@@ -4,34 +4,380 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RRSB Statistics</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Anime.js for page transitions -->
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+
     <style>
       :root {
+        /* Legacy colors (keep for compatibility) */
         --background-color: #ffffff;
         --text-color: #000000;
         --table-header-bg-color: #f2f2f2;
         --border-color: #ddd;
+
+        /* Glassmorphism Base Colors */
+        --glass-bg-light: rgba(255, 255, 255, 0.1);
+        --glass-bg-medium: rgba(255, 255, 255, 0.15);
+        --glass-bg-heavy: rgba(255, 255, 255, 0.25);
+
+        /* Vibrant Gradients - Dark Green/Midnight Blue Theme */
+        --gradient-primary: linear-gradient(135deg, #0a4d3c 0%, #1a7a5e 100%);
+        --gradient-secondary: linear-gradient(135deg, #0c3d5d 0%, #1e5a7a 100%);
+        --gradient-accent: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+        --gradient-success: linear-gradient(135deg, #06d6a0 0%, #1b9aaa 100%);
+        --gradient-warning: linear-gradient(135deg, #ef476f 0%, #ffd166 100%);
+
+        /* Background Gradients - Super Dark Green/Midnight */
+        --bg-gradient-dark: linear-gradient(135deg, #041e1c 0%, #0a2f2d 25%, #0d1b2a 75%, #0c1821 100%);
+        --bg-gradient-light: linear-gradient(135deg, #cfe0e8 0%, #b7d1da 100%);
+
+        /* Break Color Coding */
+        --break-low: rgba(156, 163, 175, 0.8);        /* Gray: <20 */
+        --break-decent: rgba(59, 130, 246, 0.8);      /* Blue: 20-49 */
+        --break-good: rgba(139, 92, 246, 0.8);        /* Purple: 50-69 */
+        --break-excellent: rgba(234, 179, 8, 0.8);    /* Gold: 70-99 */
+        --break-century: linear-gradient(135deg, #ffd700, #ff8c00, #ff1493, #9400d3, #4169e1); /* Rainbow: 100+ */
+
+        /* Text Colors */
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --text-tertiary: rgba(255, 255, 255, 0.5);
+
+        /* Shadow System */
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+        --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.25);
+
+        /* Glass Effects */
+        --blur-sm: 8px;
+        --blur-md: 16px;
+        --blur-lg: 24px;
+
+        /* Border */
+        --border-glass: 1px solid rgba(255, 255, 255, 0.18);
+
+        /* Font Families */
+        --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-display: 'Space Grotesk', var(--font-primary);
+
+        /* Font Sizes */
+        --text-xs: 0.75rem;    /* 12px */
+        --text-sm: 0.875rem;   /* 14px */
+        --text-base: 1rem;     /* 16px */
+        --text-lg: 1.125rem;   /* 18px */
+        --text-xl: 1.25rem;    /* 20px */
+        --text-2xl: 1.5rem;    /* 24px */
+        --text-3xl: 1.875rem;  /* 30px */
+        --text-4xl: 2.25rem;   /* 36px */
+        --text-5xl: 3rem;      /* 48px */
+
+        /* Font Weights */
+        --font-light: 300;
+        --font-normal: 400;
+        --font-medium: 500;
+        --font-semibold: 600;
+        --font-bold: 700;
+        --font-extrabold: 800;
+
+        /* Line Heights */
+        --leading-tight: 1.25;
+        --leading-normal: 1.5;
+        --leading-relaxed: 1.75;
+
+        /* Letter Spacing */
+        --tracking-tight: -0.025em;
+        --tracking-normal: 0;
+        --tracking-wide: 0.025em;
+
+        /* Spacing Scale */
+        --spacing-1: 0.25rem;   /* 4px */
+        --spacing-2: 0.5rem;    /* 8px */
+        --spacing-3: 0.75rem;   /* 12px */
+        --spacing-4: 1rem;      /* 16px */
+        --spacing-5: 1.25rem;   /* 20px */
+        --spacing-6: 1.5rem;    /* 24px */
+        --spacing-8: 2rem;      /* 32px */
+        --spacing-10: 2.5rem;   /* 40px */
+        --spacing-12: 3rem;     /* 48px */
+        --spacing-16: 4rem;     /* 64px */
       }
 
       [data-theme="dark"] {
+        /* Legacy colors */
         --background-color: #363537;
         --text-color: #fafafa;
         --table-header-bg-color: #555;
         --border-color: #666;
+
+        /* Dark theme already uses gradients, no need to override */
+      }
+
+      [data-theme="light"] {
+        /* Light theme overrides */
+        --glass-bg-light: rgba(255, 255, 255, 0.7);
+        --glass-bg-medium: rgba(255, 255, 255, 0.8);
+        --glass-bg-heavy: rgba(255, 255, 255, 0.9);
+
+        --text-primary: #1f2937;
+        --text-secondary: rgba(31, 41, 55, 0.7);
+        --text-tertiary: rgba(31, 41, 55, 0.5);
+
+        --border-glass: 1px solid rgba(255, 255, 255, 0.5);
+
+        --bg-gradient-light: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
       }
 
       body {
-        font-family: Arial, sans-serif;
-        background-color: var(--background-color);
-        color: var(--text-color);
-        transition: background-color 0.3s, color 0.3s;
+        font-family: var(--font-primary);
+        background: var(--bg-gradient-dark);
+        background-attachment: fixed;
+        color: var(--text-primary);
+        transition: background 0.3s, color 0.3s;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
       }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          ellipse at 30% 50%,
+          rgba(13, 115, 119, 0.15) 0%,
+          rgba(10, 77, 60, 0.08) 35%,
+          transparent 70%
+        );
+        animation: float 45s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        top: -30%;
+        right: -30%;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(
+          circle at 70% 40%,
+          rgba(12, 24, 33, 0.2) 0%,
+          transparent 60%
+        );
+        animation: floatReverse 60s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      @keyframes float {
+        0%, 100% {
+          transform: translate(0, 0) rotate(0deg) scale(1);
+          opacity: 1;
+        }
+        25% {
+          transform: translate(40px, -50px) rotate(90deg) scale(1.05);
+          opacity: 0.8;
+        }
+        50% {
+          transform: translate(-30px, 30px) rotate(180deg) scale(0.95);
+          opacity: 1;
+        }
+        75% {
+          transform: translate(50px, 20px) rotate(270deg) scale(1.02);
+          opacity: 0.9;
+        }
+      }
+
+      @keyframes floatReverse {
+        0%, 100% {
+          transform: translate(0, 0) rotate(360deg) scale(1);
+        }
+        33% {
+          transform: translate(-60px, 40px) rotate(240deg) scale(1.1);
+        }
+        66% {
+          transform: translate(40px, -30px) rotate(120deg) scale(0.9);
+        }
+      }
+
+      [data-theme="light"] body {
+        background: var(--bg-gradient-light);
+      }
+
+      /* ========================================
+         GLASSMORPHISM UTILITY CLASSES
+         ======================================== */
+
+      .glass-card {
+        background: var(--glass-bg-medium);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+        border-radius: 20px;
+        border: var(--border-glass);
+        box-shadow: var(--shadow-lg);
+        padding: var(--spacing-6);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
+      }
+
+      .glass-card:hover {
+        background: var(--glass-bg-heavy);
+        box-shadow: var(--shadow-xl);
+        transform: translateY(-4px);
+      }
+
+      .glass-card-light {
+        background: var(--glass-bg-light);
+        backdrop-filter: blur(var(--blur-sm));
+        -webkit-backdrop-filter: blur(var(--blur-sm));
+        padding: var(--spacing-4);
+      }
+
+      .glass-card-heavy {
+        background: var(--glass-bg-heavy);
+        backdrop-filter: blur(var(--blur-lg));
+        -webkit-backdrop-filter: blur(var(--blur-lg));
+      }
+
+      .glass-btn {
+        background: var(--glass-bg-medium);
+        backdrop-filter: blur(var(--blur-sm));
+        -webkit-backdrop-filter: blur(var(--blur-sm));
+        border: var(--border-glass);
+        border-radius: 12px;
+        padding: var(--spacing-3) var(--spacing-6);
+        color: var(--text-primary);
+        font-weight: var(--font-semibold);
+        font-family: var(--font-primary);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .glass-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+      }
+
+      .glass-btn:hover::before {
+        width: 300px;
+        height: 300px;
+      }
+
+      .glass-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        background: var(--glass-bg-heavy);
+      }
+
+      .glass-btn:active {
+        transform: translateY(0);
+      }
+
+      .glass-btn-primary {
+        background: var(--gradient-primary);
+        border: none;
+        color: white;
+        font-weight: var(--font-bold);
+      }
+
+      .glass-btn-primary:hover {
+        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+        filter: brightness(1.1);
+      }
+
+      /* ========================================
+         SNOOKER CUE BALL PAGE TRANSITION
+         ======================================== */
+
+      .transition-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(ellipse at center, rgba(13, 77, 60, 0.95) 0%, rgba(4, 30, 28, 0.98) 100%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: visibility 0s 0.3s, opacity 0.3s ease;
+      }
+
+      .transition-overlay.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+        transition: visibility 0s, opacity 0.3s ease;
+      }
+
+      #transition-svg {
+        width: 100%;
+        max-width: 1200px;
+        height: auto;
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+      }
+
+      /* Responsive sizing for mobile */
+      @media (max-width: 768px) {
+        #transition-svg {
+          width: 90%;
+        }
+      }
+
+      /* ========================================
+         LAYOUT & CONTAINER
+         ======================================== */
 
       .container {
         width: 98%;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 0 10px;
+        padding: var(--spacing-4);
+        position: relative;
+        z-index: 1;
+      }
+
+      @media (min-width: 768px) {
+        .container {
+          width: 90%;
+          padding: var(--spacing-6);
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .container {
+          padding: var(--spacing-8);
+        }
       }
 
       .mode-toggle-container {
@@ -1054,9 +1400,49 @@
   </script>
 
   <body>
+    <!-- Snooker Cue Ball Page Transition Overlay -->
+    <div id="cue-ball-transition" class="transition-overlay">
+      <svg id="transition-svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+        <!-- Snooker table background -->
+        <defs>
+          <radialGradient id="ballGradient" cx="35%" cy="35%">
+            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+            <stop offset="60%" style="stop-color:#f0f0f0;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#d0d0d0;stop-opacity:1" />
+          </radialGradient>
+          <radialGradient id="ballShadow" cx="50%" cy="50%">
+            <stop offset="0%" style="stop-color:#000000;stop-opacity:0.3" />
+            <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
+          </radialGradient>
+        </defs>
+
+        <!-- Ball shadow -->
+        <ellipse id="ball-shadow" cx="600" cy="420" rx="35" ry="8" fill="url(#ballShadow)" opacity="0.5"/>
+
+        <!-- White cue ball -->
+        <circle id="cue-ball" cx="600" cy="400" r="30" fill="url(#ballGradient)" stroke="#e0e0e0" stroke-width="1"/>
+
+        <!-- Ball highlight -->
+        <circle cx="585" cy="385" r="8" fill="white" opacity="0.6"/>
+
+        <!-- Cue stick -->
+        <g id="cue-stick">
+          <defs>
+            <linearGradient id="cueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#8b4513;stop-opacity:1" />
+              <stop offset="70%" style="stop-color:#a0522d;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#deb887;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <rect x="200" y="395" width="350" height="10" rx="5" fill="url(#cueGradient)"/>
+          <circle cx="205" cy="400" r="6" fill="#f5f5dc"/>
+        </g>
+      </svg>
+    </div>
+
     <div class="container">
       <div class="header">
-        <div class="burger-menu" onclick="toggleMenu()">☰</div>
+        <div class="burger-menu">☰</div>
         <h2 id="pageTitle" class="page-title">Daily Breaks</h2>
         <div class="menu-content" id="burgerMenuContent">
           <a href="?tab=breaks" class="menu-item">Breaks</a>
@@ -1284,23 +1670,160 @@
           }
         }
 
+        // ========================================
+        // SNOOKER CUE BALL TRANSITION ANIMATION
+        // ========================================
+
+        let isTransitionPlaying = false;
+
+        function playCueBallTransition(callback) {
+          // Check if anime.js is loaded
+          if (typeof anime === 'undefined') {
+            console.warn('anime.js not loaded, skipping transition');
+            if (callback) callback();
+            return;
+          }
+
+          if (isTransitionPlaying) {
+            if (callback) callback();
+            return;
+          }
+          isTransitionPlaying = true;
+
+          const overlay = document.getElementById('cue-ball-transition');
+          const cueStick = document.getElementById('cue-stick');
+          const cueBall = document.getElementById('cue-ball');
+          const ballShadow = document.getElementById('ball-shadow');
+
+          if (!overlay || !cueStick || !cueBall || !ballShadow) {
+            console.warn('Transition elements not found, skipping animation');
+            isTransitionPlaying = false;
+            if (callback) callback();
+            return;
+          }
+
+          // Show overlay
+          overlay.classList.add('active');
+
+          // Create timeline for the animation
+          const timeline = anime.timeline({
+            easing: 'easeInOutQuad',
+            complete: () => {
+              // Hide overlay with fade
+              overlay.classList.remove('active');
+              isTransitionPlaying = false;
+
+              // Execute callback after transition completes
+              if (callback) setTimeout(callback, 300);
+            }
+          });
+
+          // Phase 1: Cue stick enters from left (0-400ms)
+          timeline.add({
+            targets: cueStick,
+            translateX: ['-200px', '0px'],
+            duration: 400,
+            easing: 'easeOutQuad'
+          });
+
+          // Phase 2: Cue pulls back slightly before strike (400-600ms)
+          timeline.add({
+            targets: cueStick,
+            translateX: [0, -30],
+            duration: 200,
+            easing: 'easeInQuad'
+          }, 400);
+
+          // Phase 3: Cue strikes with force (600-750ms)
+          timeline.add({
+            targets: cueStick,
+            translateX: [-30, 50],
+            duration: 150,
+            easing: 'easeOutCubic'
+          }, 600);
+
+          // Camera shake on impact (600-700ms)
+          timeline.add({
+            targets: '#transition-svg',
+            translateX: [0, -5, 5, -3, 3, 0],
+            duration: 100,
+            easing: 'easeOutQuad'
+          }, 600);
+
+          // Phase 4: Ball rolls off screen with physics (750-1500ms)
+          timeline.add({
+            targets: cueBall,
+            translateX: [0, 800],
+            rotate: [0, 720],
+            duration: 750,
+            easing: 'easeInQuad'
+          }, 750);
+
+          // Shadow follows ball
+          timeline.add({
+            targets: ballShadow,
+            translateX: [0, 800],
+            scaleX: [1, 0.6],
+            opacity: [0.5, 0.1],
+            duration: 750,
+            easing: 'easeInQuad'
+          }, 750);
+
+          // Phase 5: Cue stick exits (900-1200ms)
+          timeline.add({
+            targets: cueStick,
+            translateX: [50, 800],
+            opacity: [1, 0],
+            duration: 300,
+            easing: 'easeInQuad'
+          }, 900);
+
+          // Reset positions after animation completes
+          setTimeout(() => {
+            anime.set(cueStick, { translateX: 0, opacity: 1 });
+            anime.set(cueBall, { translateX: 0, rotate: 0 });
+            anime.set(ballShadow, { translateX: 0, scaleX: 1, opacity: 0.5 });
+          }, 1600);
+        }
+
         handleTabSwitching();
         setupAutoRefreshIfLiveScores();
 
-        // Rest of the initialization code
-        iconSun.addEventListener("click", function () {
-          document.documentElement.setAttribute("data-theme", "light");
-          localStorage.setItem("theme", "light"); // Save theme preference
-          iconSun.style.display = "none";
-          iconMoon.style.display = "block";
+        // Add animation to menu navigation
+        document.querySelectorAll('.menu-item').forEach(link => {
+          link.addEventListener('click', (e) => {
+            // Only animate if not initial load and if going to a different tab
+            const currentTab = new URLSearchParams(window.location.search).get('tab') || 'breaks';
+            const targetUrl = new URL(link.href, window.location.origin);
+            const targetTab = new URLSearchParams(targetUrl.search).get('tab') || 'breaks';
+
+            if (currentTab !== targetTab) {
+              e.preventDefault();
+              playCueBallTransition(() => {
+                window.location.href = link.href;
+              });
+            }
+          });
         });
 
-        iconMoon.addEventListener("click", function () {
-          document.documentElement.setAttribute("data-theme", "dark");
-          localStorage.setItem("theme", "dark"); // Save theme preference
-          iconMoon.style.display = "none";
-          iconSun.style.display = "block";
-        });
+        // Rest of the initialization code
+        if (iconSun) {
+          iconSun.addEventListener("click", function () {
+            document.documentElement.setAttribute("data-theme", "light");
+            localStorage.setItem("theme", "light"); // Save theme preference
+            iconSun.style.display = "none";
+            if (iconMoon) iconMoon.style.display = "block";
+          });
+        }
+
+        if (iconMoon) {
+          iconMoon.addEventListener("click", function () {
+            document.documentElement.setAttribute("data-theme", "dark");
+            localStorage.setItem("theme", "dark"); // Save theme preference
+            iconMoon.style.display = "none";
+            if (iconSun) iconSun.style.display = "block";
+          });
+        }
 
         document.addEventListener("click", function (event) {
           if (event.target.matches(".expand-icon")) {
@@ -1357,7 +1880,7 @@
             if (container.style.display === "none") {
               try {
                 const response = await fetch(
-                  "https://rrsb-scoreboard-server.onrender.com/breaks-matrix"
+                  "http://localhost:3000/breaks-matrix"
                 );
                 const { data } = await response.json();
                 populateBreakMatrix(data);
@@ -1473,7 +1996,7 @@
 
         function fetchAndDisplayBreaks(date) {
           // fetch(`http://localhost:3000/breaks/${date}`)
-          fetch(`https://rrsb-scoreboard-server.onrender.com/breaks/${date}`)
+          fetch(`http://localhost:3000/breaks/${date}`)
             .then((response) => response.json())
             .then((data) => updateTable("breaks-table", data.data))
             .catch((error) => console.error("Error fetching data:", error));
@@ -1518,7 +2041,7 @@
           try {
             const response = await fetch(
               // "http://localhost:3000/breaks/leaderboard"
-              "https://rrsb-scoreboard-server.onrender.com/breaks/leaderboard"
+              "http://localhost:3000/breaks/leaderboard"
             );
             const { data } = await response.json();
             updateTable("leaderboard-table", data, true);
@@ -1539,7 +2062,7 @@
             // Fetch available years
             const yearsResponse = await fetch(
               // "http://localhost:3000/data/years"
-              "https://rrsb-scoreboard-server.onrender.com/data/years"
+              "http://localhost:3000/data/years"
             );
             const { data: years } = await yearsResponse.json();
 
@@ -1567,7 +2090,7 @@
                 } else {
                   const response = await fetch(
                     // `http://localhost:3000/breaks/year/${selectedValue}`
-                    `https://rrsb-scoreboard-server.onrender.com/breaks/year/${selectedValue}`
+                    `http://localhost:3000/breaks/year/${selectedValue}`
                   );
                   const { data } = await response.json();
                   updateTable("leaderboard-table", data, true);
@@ -1609,6 +2132,16 @@
             const url = path + queryString;
             gtag("config", "G-DPK8ZQTWBC", { page_path: url });
           }
+
+          // Check if we should show animation (not on very first page load of session)
+          const hasNavigatedBefore = sessionStorage.getItem('hasNavigated');
+          const shouldAnimate = hasNavigatedBefore === 'true';
+
+          // Mark that we've navigated at least once
+          sessionStorage.setItem('hasNavigated', 'true');
+
+          // Function to execute tab switch logic
+          function executeTabSwitch() {
 
           // Handling tab visibility
           if (tab === "livescores") {
@@ -1659,6 +2192,19 @@
               ?.classList.add("hidden");
             pageTitleElement.textContent = "Daily Breaks";
             trackPageView();
+          }
+          }
+
+          // Execute tab switch with or without animation
+          console.log('shouldAnimate:', shouldAnimate);
+          if (shouldAnimate) {
+            // Play cue ball transition animation on navigation
+            console.log('Playing cue ball transition...');
+            playCueBallTransition(executeTabSwitch);
+          } else {
+            // No animation on very first page load
+            console.log('Skipping animation on first load');
+            executeTabSwitch();
           }
         }
 
@@ -1763,7 +2309,7 @@
           try {
             const response = await fetch(
               // "http://localhost:3000/api/matches/live"
-              "https://rrsb-scoreboard-server.onrender.com/api/matches/live"
+              "http://localhost:3000/api/matches/live"
             );
             const data = await response.json();
             matches = data.data || [];
@@ -1912,7 +2458,7 @@
         async function loadPlayerProfile(playerName) {
           try {
             const response = await fetch(
-              `https://rrsb-scoreboard-server.onrender.com/players/${encodeURIComponent(
+              `http://localhost:3000/players/${encodeURIComponent(
                 playerName
               )}`
             );
@@ -2083,7 +2629,7 @@
           async function loadMatches(page = 1, opponent = "") {
             try {
               const limit = 1000;
-              const url = `https://rrsb-scoreboard-server.onrender.com/matches/player/${encodeURIComponent(
+              const url = `http://localhost:3000/matches/player/${encodeURIComponent(
                 playerName
               )}?page=${page}&limit=${limit}${
                 opponent ? `&opponent=${encodeURIComponent(opponent)}` : ""
@@ -2176,7 +2722,7 @@
               if (opponentSelect && opponentSelect.options.length <= 1) {
                 try {
                   const playersResponse = await fetch(
-                    "https://rrsb-scoreboard-server.onrender.com/players"
+                    "http://localhost:3000/players"
                   );
                   const { data: players } = await playersResponse.json();
 
