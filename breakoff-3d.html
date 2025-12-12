@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RRSB - 3D Break-Off Animation</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js - Using importmap for ES modules -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      /* Match index.html design system */
+      --bg-gradient-dark: linear-gradient(135deg, #041e1c 0%, #0a2f2d 25%, #0d1b2a 75%, #0c1821 100%);
+      --glass-bg-light: rgba(255, 255, 255, 0.1);
+      --glass-bg-medium: rgba(255, 255, 255, 0.15);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-display: 'Space Grotesk', var(--font-primary);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: var(--font-primary);
+      background: var(--bg-gradient-dark);
+      background-attachment: fixed;
+      color: var(--text-primary);
+    }
+
+    #snooker-canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-gradient-dark);
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      padding: 3rem;
+      background: var(--glass-bg-medium);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .loading-spinner {
+      width: 80px;
+      height: 80px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #loading-text {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.025em;
+    }
+
+    #loading-progress {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    #controls-overlay {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #controls-overlay.visible {
+      opacity: 1;
+    }
+
+    .control-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--glass-bg-medium);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: var(--font-primary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .control-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div id="loading-text">RRSB Break-Off</div>
+      <div id="loading-progress">Initializing 3D Scene...</div>
+    </div>
+  </div>
+
+  <!-- Main Canvas -->
+  <canvas id="snooker-canvas"></canvas>
+
+  <!-- Control Overlay -->
+  <div id="controls-overlay">
+    <button class="control-btn" id="btn-play-pause">Pause</button>
+    <button class="control-btn" id="btn-reset">Reset</button>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+    import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+
+    // Import Cannon.js
+    const CANNON = await import('https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/+esm').then(m => m.default || m);
+
+    // ========================================
+    // CONFIGURATION
+    // ========================================
+    const CONFIG = {
+      // Rendering
+      renderer: {
+        antialias: true,
+        powerPreference: "high-performance",
+        pixelRatio: Math.min(window.devicePixelRatio, 2),
+        shadowMapEnabled: true,
+        shadowMapType: THREE.PCFSoftShadowMap,
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 1.2
+      },
+
+      // Resolution
+      resolution: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      },
+
+      // Physics
+      physics: {
+        gravity: -9.82,
+        fixedTimeStep: 1/240,
+        maxSubSteps: 10
+      },
+
+      // Ball properties (snooker balls: 52.5mm diameter)
+      ball: {
+        radius: 0.02625, // meters
+        mass: 0.14, // kg
+        segments: 64, // high poly
+        restitution: 0.9,
+        friction: 0.15,
+        linearDamping: 0.3,
+        angularDamping: 0.3
+      },
+
+      // Camera POV
+      camera: {
+        fov: 50,
+        near: 0.01,
+        far: 100,
+        position: { x: 0, y: 0.5, z: 2.8 },
+        lookAt: { x: 0, y: 0, z: -2.0 }
+      },
+
+      // Table dimensions (full-size snooker table)
+      table: {
+        length: 3.6576,
+        width: 1.8288,
+        cushionHeight: 0.037,
+
+        // Spot positions
+        spots: {
+          black: { x: 0, z: -1.6002 },
+          pink: { x: 0, z: -0.9144 },
+          blue: { x: 0, z: 0 },
+          brown: { x: 0, z: 0.9144 },
+          green: { x: -0.292, z: 0.9144 },
+          yellow: { x: 0.292, z: 0.9144 }
+        }
+      }
+    };
+
+    // ========================================
+    // SCENE SETUP
+    // ========================================
+    class SnookerScene {
+      constructor() {
+        this.scene = new THREE.Scene();
+        this.scene.background = null; // Transparent to show CSS background
+        this.scene.fog = new THREE.Fog(0x041e1c, 5, 15); // Atmospheric depth
+
+        this.setupCamera();
+        this.setupRenderer();
+        this.setupLighting();
+        this.createTableSurface();
+      }
+
+      setupCamera() {
+        const { fov, near, far, position, lookAt } = CONFIG.camera;
+
+        this.camera = new THREE.PerspectiveCamera(
+          fov,
+          window.innerWidth / window.innerHeight,
+          near,
+          far
+        );
+
+        this.camera.position.set(position.x, position.y, position.z);
+        this.camera.lookAt(new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z));
+      }
+
+      setupRenderer() {
+        this.renderer = new THREE.WebGLRenderer({
+          canvas: document.getElementById('snooker-canvas'),
+          antialias: CONFIG.renderer.antialias,
+          powerPreference: CONFIG.renderer.powerPreference,
+          alpha: true // Allow CSS background to show through
+        });
+
+        this.renderer.setPixelRatio(CONFIG.renderer.pixelRatio);
+        this.renderer.setSize(CONFIG.resolution.width, CONFIG.resolution.height);
+        this.renderer.shadowMap.enabled = CONFIG.renderer.shadowMapEnabled;
+        this.renderer.shadowMap.type = CONFIG.renderer.shadowMapType;
+        this.renderer.toneMapping = CONFIG.renderer.toneMapping;
+        this.renderer.toneMappingExposure = CONFIG.renderer.toneMappingExposure;
+      }
+
+      setupLighting() {
+        // 1. Ambient light (dim club atmosphere)
+        const ambient = new THREE.AmbientLight(0x2a3f4f, 0.3);
+        this.scene.add(ambient);
+
+        // 2. Main overhead spotlights (classic snooker table illumination)
+        this.createOverheadLight(-1.8, 0); // Top end
+        this.createOverheadLight(0, 1); // Center
+        this.createOverheadLight(1.8, 2); // Baulk end
+
+        // 3. Rim light (for ball edge definition)
+        const rimLight = new THREE.DirectionalLight(0x5a8fb0, 0.4);
+        rimLight.position.set(3, 1, 0);
+        this.scene.add(rimLight);
+
+        // 4. Fill light (soft ambient from room)
+        const fillLight = new THREE.HemisphereLight(0x4a5f7f, 0x1a1f2e, 0.5);
+        this.scene.add(fillLight);
+
+        // 5. Environment map for reflections
+        this.setupEnvironmentMap();
+      }
+
+      createOverheadLight(zPos, index) {
+        const light = new THREE.SpotLight(0xfff4e6, 2.5);
+        light.position.set(0, 2.5, zPos);
+        light.angle = Math.PI / 6;
+        light.penumbra = 0.3;
+        light.decay = 2;
+        light.castShadow = true;
+        light.shadow.mapSize.width = 2048;
+        light.shadow.mapSize.height = 2048;
+        light.shadow.camera.near = 0.5;
+        light.shadow.camera.far = 10;
+
+        this.scene.add(light);
+
+        // Optional: Add visible light cone for debugging
+        // const helper = new THREE.SpotLightHelper(light);
+        // this.scene.add(helper);
+      }
+
+      setupEnvironmentMap() {
+        // Create environment for realistic reflections
+        const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {
+          format: THREE.RGBFormat,
+          generateMipmaps: true,
+          minFilter: THREE.LinearMipmapLinearFilter
+        });
+
+        this.cubeCamera = new THREE.CubeCamera(0.1, 10, cubeRenderTarget);
+        this.cubeCamera.position.set(0, 0.5, 0);
+        this.scene.add(this.cubeCamera);
+      }
+
+      createTableSurface() {
+        // Create visible green baize table surface
+        const tableGeometry = new THREE.PlaneGeometry(CONFIG.table.width, CONFIG.table.length);
+        const tableMaterial = new THREE.MeshStandardMaterial({
+          color: 0x0a4d3c, // Dark green baize
+          roughness: 0.8,
+          metalness: 0.0,
+          side: THREE.DoubleSide
+        });
+
+        const table = new THREE.Mesh(tableGeometry, tableMaterial);
+        table.rotation.x = -Math.PI / 2; // Rotate to horizontal
+        table.position.y = 0;
+        table.receiveShadow = true;
+        this.scene.add(table);
+      }
+    }
+
+    // ========================================
+    // BALL MANAGEMENT
+    // ========================================
+    class BallManager {
+      constructor(scene, cubeCamera) {
+        this.scene = scene;
+        this.cubeCamera = cubeCamera;
+        this.balls = [];
+        this.whiteBall = null;
+        this.targetRed = null;
+
+        // Accurate snooker ball colors
+        this.COLORS = {
+          white: 0xFFFFF0,   // Ivory white
+          red: 0xC41E3A,     // Deep red
+          yellow: 0xFFD700,  // Gold yellow
+          green: 0x228B22,   // Forest green
+          brown: 0x8B4513,   // Saddle brown
+          blue: 0x0047AB,    // Cobalt blue
+          pink: 0xFF69B4,    // Hot pink
+          black: 0x0A0A0A    // Near black
+        };
+      }
+
+      createBallMaterial(color, ballType) {
+        // High-quality PBR material for photorealism
+        const material = new THREE.MeshPhysicalMaterial({
+          color: color,
+          metalness: 0.1,        // Slight metallic sheen
+          roughness: 0.15,       // Polished surface
+          clearcoat: 1.0,        // Strong clear coat (glossy finish)
+          clearcoatRoughness: 0.1, // Very smooth clear coat
+          reflectivity: 0.9,     // High reflectivity
+          envMapIntensity: 1.5,  // Strong environment reflections
+          transparent: false,
+
+          // Enable environment mapping (set later)
+          envMap: null
+        });
+
+        // Add emissive glow for bloom effect
+        if (ballType !== 'white') {
+          const glowColor = new THREE.Color(color);
+          glowColor.multiplyScalar(0.15);
+          material.emissive = glowColor;
+          material.emissiveIntensity = 0.3;
+        }
+
+        return material;
+      }
+
+      createBall(color, position, ballType = 'standard') {
+        // High-poly sphere geometry
+        const geometry = new THREE.SphereGeometry(
+          CONFIG.ball.radius,
+          CONFIG.ball.segments,
+          CONFIG.ball.segments
+        );
+
+        const material = this.createBallMaterial(color, ballType);
+        const mesh = new THREE.Mesh(geometry, material);
+
+        mesh.position.copy(position);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        // Store metadata
+        mesh.userData.color = ballType;
+        mesh.userData.type = ballType;
+
+        // Add contact shadow (blob shadow on table)
+        this.addContactShadow(mesh);
+
+        return mesh;
+      }
+
+      addContactShadow(ballMesh) {
+        // Create circular shadow plane under ball
+        const shadowGeometry = new THREE.CircleGeometry(CONFIG.ball.radius * 1.2, 16);
+        const shadowMaterial = new THREE.MeshBasicMaterial({
+          color: 0x000000,
+          transparent: true,
+          opacity: 0.4,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        });
+
+        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+        shadow.rotation.x = -Math.PI / 2; // Make horizontal
+        shadow.position.y = 0.001; // Just above table surface
+
+        ballMesh.add(shadow);
+        shadow.position.y = -CONFIG.ball.radius + 0.001; // Position directly under ball
+      }
+
+      initializeBalls() {
+        const Y_OFFSET = CONFIG.ball.radius; // Ball radius (sitting on table)
+
+        // Helper to create positioned ball
+        const addBall = (color, pos, type) => {
+          const ball = this.createBall(
+            this.COLORS[color],
+            new THREE.Vector3(pos.x, Y_OFFSET, pos.z),
+            type
+          );
+          ball.userData.colorName = color;
+          this.balls.push(ball);
+          this.scene.add(ball);
+          return ball;
+        };
+
+        // 1. Color balls on spots
+        addBall('black', CONFIG.table.spots.black, 'black');
+        addBall('pink', CONFIG.table.spots.pink, 'pink');
+        addBall('blue', CONFIG.table.spots.blue, 'blue');
+        addBall('brown', CONFIG.table.spots.brown, 'brown');
+        addBall('green', CONFIG.table.spots.green, 'green');
+        addBall('yellow', CONFIG.table.spots.yellow, 'yellow');
+
+        // 2. Red triangle (15 balls)
+        const apex = { x: 0, z: CONFIG.table.spots.pink.z - 0.053 };
+        const BALL_DIAMETER = CONFIG.ball.radius * 2;
+        const ROW_SPACING = BALL_DIAMETER * Math.sqrt(3) / 2;
+
+        // Row 1 (apex) - 1 ball
+        addBall('red', { x: apex.x, z: apex.z }, 'red');
+
+        // Row 2 - 2 balls
+        addBall('red', { x: apex.x - BALL_DIAMETER/2, z: apex.z - ROW_SPACING }, 'red');
+        addBall('red', { x: apex.x + BALL_DIAMETER/2, z: apex.z - ROW_SPACING }, 'red');
+
+        // Row 3 - 3 balls
+        for (let i = -1; i <= 1; i++) {
+          addBall('red', { x: apex.x + i * BALL_DIAMETER, z: apex.z - ROW_SPACING * 2 }, 'red');
+        }
+
+        // Row 4 - 4 balls
+        for (let i = -1.5; i <= 1.5; i++) {
+          addBall('red', { x: apex.x + i * BALL_DIAMETER, z: apex.z - ROW_SPACING * 3 }, 'red');
+        }
+
+        // Row 5 (base) - 5 balls
+        for (let i = -2; i <= 2; i++) {
+          const ball = addBall('red', { x: apex.x + i * BALL_DIAMETER, z: apex.z - ROW_SPACING * 4 }, 'red');
+
+          // Mark right-side bottom red (furthest away) as target
+          if (i === 2) {
+            ball.userData.isTarget = true;
+            this.targetRed = ball;
+          }
+        }
+
+        // 3. White ball (cue ball) - positioned in D for break-off
+        this.whiteBall = addBall('white', { x: 0.05, z: 1.0 }, 'white');
+
+        console.log(`Created ${this.balls.length} snooker balls`);
+        return this.balls;
+      }
+
+      updateReflections(renderer) {
+        // Update environment map for dynamic reflections
+        // Hide balls temporarily
+        this.balls.forEach(ball => ball.visible = false);
+
+        // Update cube camera
+        this.cubeCamera.update(renderer, this.scene);
+
+        // Show balls and update their environment maps
+        this.balls.forEach(ball => {
+          ball.visible = true;
+          ball.material.envMap = this.cubeCamera.renderTarget.texture;
+          ball.material.needsUpdate = true;
+        });
+      }
+    }
+
+    // ========================================
+    // PHYSICS ENGINE
+    // ========================================
+    class PhysicsEngine {
+      constructor() {
+        this.world = new CANNON.World({
+          gravity: new CANNON.Vec3(0, CONFIG.physics.gravity, 0)
+        });
+
+        this.world.defaultContactMaterial.friction = 0.2;
+        this.world.defaultContactMaterial.restitution = 0.8;
+
+        // High-quality solver for accurate collisions
+        this.world.solver.iterations = 20;
+        this.world.solver.tolerance = 0.0001;
+
+        // Materials
+        this.ballMaterial = new CANNON.Material('ballMaterial');
+        this.cushionMaterial = new CANNON.Material('cushionMaterial');
+        this.tableMaterial = new CANNON.Material('tableMaterial');
+
+        // Contact materials
+        this.setupContactMaterials();
+
+        // Create static world geometry
+        this.createTableSurface();
+        this.createCushions();
+
+        this.bodies = [];
+      }
+
+      setupContactMaterials() {
+        // Ball-to-ball contact
+        const ballContact = new CANNON.ContactMaterial(
+          this.ballMaterial,
+          this.ballMaterial,
+          {
+            friction: CONFIG.ball.friction,
+            restitution: CONFIG.ball.restitution,
+            contactEquationStiffness: 1e8,
+            contactEquationRelaxation: 3
+          }
+        );
+        this.world.addContactMaterial(ballContact);
+
+        // Ball-to-cushion contact
+        const cushionContact = new CANNON.ContactMaterial(
+          this.ballMaterial,
+          this.cushionMaterial,
+          {
+            friction: 0.1,
+            restitution: 0.85 // Slightly less bouncy than ball-to-ball
+          }
+        );
+        this.world.addContactMaterial(cushionContact);
+
+        // Ball-to-table contact
+        const tableContact = new CANNON.ContactMaterial(
+          this.ballMaterial,
+          this.tableMaterial,
+          {
+            friction: 0.3,
+            restitution: 0.0 // No bounce on table surface
+          }
+        );
+        this.world.addContactMaterial(tableContact);
+      }
+
+      createTableSurface() {
+        // Invisible table plane
+        const tableShape = new CANNON.Plane();
+        const tableBody = new CANNON.Body({
+          mass: 0, // Static
+          material: this.tableMaterial
+        });
+        tableBody.addShape(tableShape);
+        tableBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Rotate to horizontal
+        this.world.addBody(tableBody);
+      }
+
+      createCushions() {
+        // Invisible cushion walls (box colliders)
+        const TABLE = CONFIG.table;
+        const cushionThickness = 0.05;
+
+        // Helper to create cushion
+        const addCushion = (width, height, depth, x, y, z) => {
+          const shape = new CANNON.Box(new CANNON.Vec3(width/2, height/2, depth/2));
+          const body = new CANNON.Body({
+            mass: 0,
+            material: this.cushionMaterial
+          });
+          body.addShape(shape);
+          body.position.set(x, y, z);
+          this.world.addBody(body);
+        };
+
+        // Top cushion (black end)
+        addCushion(
+          TABLE.width,
+          TABLE.cushionHeight,
+          cushionThickness,
+          0,
+          TABLE.cushionHeight/2,
+          -(TABLE.length/2 + cushionThickness/2)
+        );
+
+        // Bottom cushion (baulk end)
+        addCushion(
+          TABLE.width,
+          TABLE.cushionHeight,
+          cushionThickness,
+          0,
+          TABLE.cushionHeight/2,
+          TABLE.length/2 + cushionThickness/2
+        );
+
+        // Left cushion (from POV)
+        addCushion(
+          cushionThickness,
+          TABLE.cushionHeight,
+          TABLE.length,
+          -(TABLE.width/2 + cushionThickness/2),
+          TABLE.cushionHeight/2,
+          0
+        );
+
+        // Right cushion (from POV)
+        addCushion(
+          cushionThickness,
+          TABLE.cushionHeight,
+          TABLE.length,
+          TABLE.width/2 + cushionThickness/2,
+          TABLE.cushionHeight/2,
+          0
+        );
+
+        console.log('Created 4 invisible cushions');
+      }
+
+      addBall(mesh) {
+        // Create physics body for Three.js mesh
+        const shape = new CANNON.Sphere(CONFIG.ball.radius);
+        const body = new CANNON.Body({
+          mass: CONFIG.ball.mass,
+          shape: shape,
+          material: this.ballMaterial,
+          linearDamping: CONFIG.ball.linearDamping,
+          angularDamping: CONFIG.ball.angularDamping
+        });
+
+        body.position.copy(mesh.position);
+        this.world.addBody(body);
+
+        // Link mesh and body
+        this.bodies.push({ mesh, body });
+
+        return body;
+      }
+
+      applyCueStrike(ballBody, direction, power) {
+        // Apply impulse to white ball
+        const impulse = new CANNON.Vec3(
+          direction.x * power,
+          0,
+          direction.z * power
+        );
+
+        ballBody.applyImpulse(impulse, ballBody.position);
+
+        console.log('Cue strike applied:', power, 'N');
+      }
+
+      step(deltaTime) {
+        this.world.step(
+          CONFIG.physics.fixedTimeStep,
+          deltaTime,
+          CONFIG.physics.maxSubSteps
+        );
+
+        // Sync Three.js meshes with Cannon.js bodies
+        this.bodies.forEach(({ mesh, body }) => {
+          mesh.position.copy(body.position);
+          mesh.quaternion.copy(body.quaternion);
+        });
+      }
+    }
+
+    // ========================================
+    // CUE STICK
+    // ========================================
+    class CueStick {
+      constructor(scene) {
+        this.scene = scene;
+        this.cue = null;
+        this.createCue();
+      }
+
+      createCue() {
+        // Snooker cue: 1.4m long, tapered cylinder
+        const cueGroup = new THREE.Group();
+
+        // Main shaft (wood)
+        const shaftGeometry = new THREE.CylinderGeometry(0.006, 0.012, 1.4, 16);
+        const shaftMaterial = new THREE.MeshStandardMaterial({
+          color: 0x8B4513, // Saddle brown
+          roughness: 0.3,
+          metalness: 0.1,
+          map: null // Could add wood texture
+        });
+        const shaft = new THREE.Mesh(shaftGeometry, shaftMaterial);
+        shaft.castShadow = true;
+        cueGroup.add(shaft);
+
+        // Tip (leather, slightly darker)
+        const tipGeometry = new THREE.CylinderGeometry(0.006, 0.006, 0.01, 16);
+        const tipMaterial = new THREE.MeshStandardMaterial({
+          color: 0x654321,
+          roughness: 0.9
+        });
+        const tip = new THREE.Mesh(tipGeometry, tipMaterial);
+        tip.position.y = -0.705; // At the front
+        cueGroup.add(tip);
+
+        this.cue = cueGroup;
+        this.cue.visible = false;
+        this.scene.add(this.cue);
+      }
+
+      position(whiteBall, targetBall) {
+        // Position cue behind white ball, pointing at target
+        const direction = new THREE.Vector3()
+          .subVectors(targetBall.position, whiteBall.position)
+          .normalize();
+
+        // Position 30cm behind white ball
+        const cuePosition = whiteBall.position.clone()
+          .add(direction.clone().multiplyScalar(-0.3));
+
+        this.cue.position.copy(cuePosition);
+
+        // Rotate cue to point at target
+        const lookAtPoint = whiteBall.position.clone();
+        this.cue.lookAt(lookAtPoint);
+        this.cue.rotateX(Math.PI / 2); // Adjust for cylinder orientation
+
+        this.cue.visible = true;
+      }
+
+      hide() {
+        this.cue.visible = false;
+      }
+
+      animate(progress) {
+        // Animate cue strike (0 = back, 1 = contact)
+        // This will move the cue forward during strike
+        return progress;
+      }
+    }
+
+    // ========================================
+    // ANIMATION CONTROLLER
+    // ========================================
+    class AnimationController {
+      constructor(scene, camera, ballManager, physics, cueStick) {
+        this.scene = scene;
+        this.camera = camera;
+        this.ballManager = ballManager;
+        this.physics = physics;
+        this.cueStick = cueStick;
+
+        this.phases = [];
+        this.currentPhase = 0;
+        this.phaseStartTime = 0;
+        this.animationStartTime = 0;
+        this.isAnimating = false;
+
+        this.createTimeline();
+      }
+
+      createTimeline() {
+        this.phases = [
+          {
+            name: 'Initial Setup',
+            duration: 2000,
+            action: (progress) => this.phaseInitialSetup(progress)
+          },
+          {
+            name: 'Cue Positioning',
+            duration: 2000,
+            action: (progress) => this.phaseCuePositioning(progress)
+          },
+          {
+            name: 'Cue Strike',
+            duration: 500,
+            action: (progress) => this.phaseCueStrike(progress)
+          },
+          {
+            name: 'Shot Simulation',
+            duration: 7500,
+            action: (progress) => this.phaseShotSimulation(progress)
+          },
+          {
+            name: 'Final Position',
+            duration: 3000,
+            action: (progress) => this.phaseFinalPosition(progress)
+          },
+          {
+            name: 'Loop Pause',
+            duration: 2000,
+            action: (progress) => this.phaseLoopPause(progress)
+          }
+        ];
+      }
+
+      start() {
+        this.animationStartTime = performance.now();
+        this.phaseStartTime = this.animationStartTime;
+        this.currentPhase = 0;
+        this.isAnimating = true;
+        console.log('Animation started');
+      }
+
+      update(currentTime) {
+        if (!this.isAnimating) return;
+
+        const elapsed = currentTime - this.phaseStartTime;
+        const phase = this.phases[this.currentPhase];
+
+        if (!phase) {
+          // Animation complete, loop
+          this.reset();
+          this.start();
+          return;
+        }
+
+        const progress = Math.min(elapsed / phase.duration, 1.0);
+
+        // Execute phase action
+        phase.action(progress);
+
+        // Move to next phase when current completes
+        if (progress >= 1.0) {
+          this.currentPhase++;
+          this.phaseStartTime = currentTime;
+
+          if (this.currentPhase < this.phases.length) {
+            console.log(`Starting phase: ${this.phases[this.currentPhase].name}`);
+          }
+        }
+      }
+
+      phaseInitialSetup(progress) {
+        // Camera pan showing table setup
+        // Smooth ease-in-out
+        const t = this.easeInOutCubic(progress);
+
+        // Start from high overview, move to POV position
+        const startPos = new THREE.Vector3(0, 1.5, 1.0);
+        const endPos = new THREE.Vector3(
+          this.ballManager.whiteBall.position.x,
+          this.ballManager.whiteBall.position.y + 0.15,
+          this.ballManager.whiteBall.position.z + 0.35
+        );
+
+        this.camera.position.lerpVectors(startPos, endPos, t);
+
+        const startLookAt = new THREE.Vector3(0, 0, 0);
+        const endLookAt = new THREE.Vector3(0, 0, -1.5);
+        const lookAt = new THREE.Vector3().lerpVectors(startLookAt, endLookAt, t);
+        this.camera.lookAt(lookAt);
+      }
+
+      phaseCuePositioning(progress) {
+        // Show cue moving into position
+        const t = this.easeInOutCubic(progress);
+
+        if (progress === 0) {
+          // Position cue on first frame
+          this.cueStick.position(
+            this.ballManager.whiteBall,
+            this.ballManager.targetRed
+          );
+        }
+
+        // Subtle cue adjustment animation (optional)
+      }
+
+      phaseCueStrike(progress) {
+        // Cue strikes white ball
+        if (progress === 0) {
+          // Calculate and apply strike force
+          const whiteBall = this.ballManager.whiteBall;
+          const targetRed = this.ballManager.targetRed;
+
+          const direction = new THREE.Vector3()
+            .subVectors(targetRed.position, whiteBall.position)
+            .normalize();
+
+          // Find the physics body for white ball
+          const whiteBallBody = this.physics.bodies.find(
+            b => b.mesh === whiteBall
+          )?.body;
+
+          if (whiteBallBody) {
+            // Medium power safety shot
+            const power = 4.5;
+            this.physics.applyCueStrike(whiteBallBody, direction, power);
+          }
+        }
+
+        if (progress > 0.4) {
+          // Hide cue after strike
+          this.cueStick.hide();
+        }
+      }
+
+      phaseShotSimulation(progress) {
+        // Let physics run
+        // Camera tracks white ball
+        this.trackWhiteBall();
+      }
+
+      phaseFinalPosition(progress) {
+        // Camera adjusts to show final position
+        const t = this.easeInOutCubic(progress);
+
+        const whiteBall = this.ballManager.whiteBall;
+        const brownBall = this.ballManager.balls.find(
+          b => b.userData.colorName === 'brown'
+        );
+
+        if (whiteBall && brownBall) {
+          // Camera angle to show white behind brown
+          const startPos = this.camera.position.clone();
+          const endPos = new THREE.Vector3(
+            brownBall.position.x + 0.3,
+            brownBall.position.y + 0.2,
+            brownBall.position.z + 0.5
+          );
+
+          this.camera.position.lerpVectors(startPos, endPos, t);
+          this.camera.lookAt(whiteBall.position);
+        }
+      }
+
+      phaseLoopPause(progress) {
+        // Pause before loop
+        // Could add fade out effect here
+      }
+
+      trackWhiteBall() {
+        // Smooth camera tracking of white ball
+        const whiteBall = this.ballManager.whiteBall;
+        if (!whiteBall) return;
+
+        const targetLookAt = whiteBall.position.clone();
+        const currentLookAt = new THREE.Vector3(0, 0, -10);
+        this.camera.getWorldDirection(currentLookAt);
+        currentLookAt.multiplyScalar(10).add(this.camera.position);
+
+        currentLookAt.lerp(targetLookAt, 0.05);
+        this.camera.lookAt(currentLookAt);
+      }
+
+      reset() {
+        // Reset all balls to starting positions
+        this.ballManager.balls.forEach((ball, index) => {
+          const body = this.physics.bodies[index];
+          if (body) {
+            // Reset position and velocity
+            body.body.position.copy(ball.userData.initialPosition || ball.position);
+            body.body.velocity.set(0, 0, 0);
+            body.body.angularVelocity.set(0, 0, 0);
+          }
+        });
+
+        // Reset camera
+        this.camera.position.set(0, 1.5, 1.0);
+        this.camera.lookAt(0, 0, 0);
+
+        this.currentPhase = 0;
+        console.log('Animation reset');
+      }
+
+      easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+    }
+
+    // ========================================
+    // POST-PROCESSING EFFECTS
+    // ========================================
+    class EffectsManager {
+      constructor(renderer, scene, camera) {
+        this.renderer = renderer;
+        this.scene = scene;
+        this.camera = camera;
+        this.composer = null;
+
+        this.setupComposer();
+      }
+
+      setupComposer() {
+        // Create effect composer
+        this.composer = new EffectComposer(this.renderer);
+
+        // 1. Base render pass
+        const renderPass = new RenderPass(this.scene, this.camera);
+        this.composer.addPass(renderPass);
+
+        // 2. Bloom pass (glow on balls)
+        const bloomPass = new UnrealBloomPass(
+          new THREE.Vector2(window.innerWidth, window.innerHeight),
+          1.2,  // Strength
+          0.4,  // Radius
+          0.85  // Threshold
+        );
+        this.composer.addPass(bloomPass);
+        this.bloomPass = bloomPass;
+
+        // 3. SMAA anti-aliasing pass
+        const smaaPass = new SMAAPass(
+          window.innerWidth,
+          window.innerHeight
+        );
+        this.composer.addPass(smaaPass);
+
+        // 4. Output pass (required for proper color space)
+        const outputPass = new OutputPass();
+        this.composer.addPass(outputPass);
+
+        console.log('Post-processing pipeline initialized');
+      }
+
+      render() {
+        this.composer.render();
+      }
+
+      resize(width, height) {
+        this.composer.setSize(width, height);
+
+        // Update bloom pass resolution
+        if (this.bloomPass) {
+          this.bloomPass.resolution.set(width, height);
+        }
+      }
+
+      updateBloomStrength(strength) {
+        if (this.bloomPass) {
+          this.bloomPass.strength = strength;
+        }
+      }
+    }
+
+    // ========================================
+    // LOADING MANAGER
+    // ========================================
+    class LoadingManager {
+      constructor() {
+        this.loadingScreen = document.getElementById('loading-screen');
+        this.loadingProgress = document.getElementById('loading-progress');
+      }
+
+      updateProgress(message) {
+        this.loadingProgress.textContent = message;
+      }
+
+      hide() {
+        setTimeout(() => {
+          this.loadingScreen.classList.add('hidden');
+          document.getElementById('controls-overlay').classList.add('visible');
+        }, 500);
+      }
+    }
+
+    // ========================================
+    // MAIN APPLICATION
+    // ========================================
+    class SnookerApp {
+      constructor() {
+        this.loadingManager = new LoadingManager();
+        this.isPaused = false;
+        this.init();
+      }
+
+      async init() {
+        this.loadingManager.updateProgress('Setting up 3D scene...');
+
+        // Initialize scene
+        this.sceneManager = new SnookerScene();
+        this.scene = this.sceneManager.scene;
+        this.camera = this.sceneManager.camera;
+        this.renderer = this.sceneManager.renderer;
+        this.cubeCamera = this.sceneManager.cubeCamera;
+
+        await this.delay(500);
+
+        this.loadingManager.updateProgress('Creating snooker balls...');
+
+        // Initialize balls
+        this.ballManager = new BallManager(this.scene, this.cubeCamera);
+        this.balls = this.ballManager.initializeBalls();
+
+        await this.delay(500);
+
+        this.loadingManager.updateProgress('Setting up reflections...');
+
+        // Initial reflection update
+        this.ballManager.updateReflections(this.renderer);
+
+        await this.delay(500);
+
+        this.loadingManager.updateProgress('Initializing physics engine...');
+
+        // Initialize physics
+        this.physics = new PhysicsEngine();
+
+        // Store initial ball positions for reset
+        this.balls.forEach(ball => {
+          ball.userData.initialPosition = ball.position.clone();
+        });
+
+        // Add all balls to physics world
+        this.balls.forEach(ball => {
+          this.physics.addBall(ball);
+        });
+
+        console.log(`Added ${this.balls.length} balls to physics world`);
+
+        await this.delay(500);
+
+        this.loadingManager.updateProgress('Creating cue stick...');
+
+        // Initialize cue stick
+        this.cueStick = new CueStick(this.scene);
+
+        await this.delay(300);
+
+        this.loadingManager.updateProgress('Setting up animation...');
+
+        // Initialize animation controller
+        this.animationController = new AnimationController(
+          this.scene,
+          this.camera,
+          this.ballManager,
+          this.physics,
+          this.cueStick
+        );
+
+        await this.delay(300);
+
+        this.loadingManager.updateProgress('Initializing post-processing...');
+
+        // Initialize effects manager
+        this.effectsManager = new EffectsManager(
+          this.renderer,
+          this.scene,
+          this.camera
+        );
+
+        await this.delay(300);
+
+        // Adjust camera to match POV image (behind white ball, looking down table)
+        const whiteBall = this.ballManager.whiteBall;
+        if (whiteBall) {
+          // Position camera behind and slightly above white ball
+          this.camera.position.set(
+            whiteBall.position.x,
+            whiteBall.position.y + 0.15,  // 15cm above white ball
+            whiteBall.position.z + 0.35   // 35cm behind white ball
+          );
+          // Look toward the reds
+          this.camera.lookAt(0, 0, -1.5);
+        }
+
+        this.loadingManager.updateProgress('Ready!');
+        await this.delay(500);
+
+        // Hide loading screen
+        this.loadingManager.hide();
+
+        // Setup controls
+        this.setupControls();
+
+        // Start animation loop
+        this.lastTime = performance.now();
+        this.reflectionUpdateCounter = 0;
+        this.animate();
+
+        // Start the animation sequence
+        await this.delay(500);
+        this.animationController.start();
+      }
+
+      setupControls() {
+        const playPauseBtn = document.getElementById('btn-play-pause');
+        const resetBtn = document.getElementById('btn-reset');
+
+        playPauseBtn.addEventListener('click', () => {
+          this.isPaused = !this.isPaused;
+          playPauseBtn.textContent = this.isPaused ? 'Play' : 'Pause';
+        });
+
+        resetBtn.addEventListener('click', () => {
+          this.reset();
+        });
+      }
+
+      reset() {
+        if (this.animationController) {
+          this.animationController.reset();
+          this.animationController.start();
+        }
+      }
+
+      animate() {
+        requestAnimationFrame(() => this.animate());
+
+        if (this.isPaused) return;
+
+        const currentTime = performance.now();
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+
+        // Update animation controller
+        if (this.animationController) {
+          this.animationController.update(currentTime);
+        }
+
+        // Update physics simulation
+        if (this.physics) {
+          this.physics.step(deltaTime);
+        }
+
+        // Update reflections periodically (every 10 frames for performance)
+        this.reflectionUpdateCounter++;
+        if (this.reflectionUpdateCounter >= 10 && this.ballManager) {
+          this.ballManager.updateReflections(this.renderer);
+          this.reflectionUpdateCounter = 0;
+        }
+
+        // Render scene with post-processing
+        if (this.effectsManager) {
+          this.effectsManager.render();
+        } else {
+          this.renderer.render(this.scene, this.camera);
+        }
+      }
+
+      onResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+
+        this.renderer.setSize(width, height);
+
+        if (this.effectsManager) {
+          this.effectsManager.resize(width, height);
+        }
+      }
+
+      delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+    }
+
+    // ========================================
+    // INITIALIZATION
+    // ========================================
+    const app = new SnookerApp();
+
+    // Handle window resize
+    window.addEventListener('resize', () => app.onResize());
+  </script>
+</body>
+</html>
