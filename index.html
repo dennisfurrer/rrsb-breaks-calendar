@@ -1262,6 +1262,10 @@
         border-color: rgba(20, 184, 166, 0.4);
       }
 
+      .no-animate .grid-item {
+        animation: none;
+      }
+
       /* Live indicator for active matches */
       .grid-item[data-status="active"]::before {
         content: '';
@@ -5642,8 +5646,10 @@
 
         if (isLiveScoresPage) {
           setInterval(() => {
-            window.location.reload();
-          }, 5000); // 30 seconds
+            const grid = document.querySelector(".scoreboard-grid");
+            if (grid) grid.classList.add("no-animate");
+            createScoreboardGrid();
+          }, 5000);
         }
 
         async function loadPlayerProfile(playerName) {
