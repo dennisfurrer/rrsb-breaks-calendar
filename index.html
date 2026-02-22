@@ -1994,6 +1994,8 @@
         align-items: center;
         justify-content: center;
         animation: fadeIn 0.3s ease;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .match-modal-content {
@@ -2011,6 +2013,7 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        min-height: 0;
         animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
@@ -2073,7 +2076,10 @@
       .match-modal-body {
         padding: var(--spacing-8);
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         flex: 1;
+        min-height: 0;
       }
 
       /* Match Details Content - Scoreboard Layout */
@@ -2160,50 +2166,38 @@
       .modal-frames-bar {
         background: linear-gradient(135deg, #f59e0b, #d97706);
         border-radius: 12px;
-        padding: var(--spacing-4);
-        margin-bottom: var(--spacing-4);
-        text-align: center;
-      }
-
-      .modal-frames-label {
-        display: block;
-        font-size: 1.2rem;
-        font-weight: var(--font-bold);
-        color: #000;
-        margin-bottom: var(--spacing-2);
-      }
-
-      .modal-frames-numbers {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: var(--spacing-6);
-        font-size: 2.5rem;
-        font-weight: var(--font-extrabold);
-        color: #000;
-      }
-
-      .modal-scores-row {
-        background: rgba(100, 100, 100, 0.4);
-        border-radius: 12px;
-        padding: var(--spacing-6);
+        padding: var(--spacing-4) var(--spacing-6);
         margin-bottom: var(--spacing-4);
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
-      .modal-score-left,
-      .modal-score-right {
-        font-size: 4rem;
-        font-weight: var(--font-extrabold);
-        color: #fff;
+      .modal-frames-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
-      .modal-score-label {
-        font-size: 1.5rem;
+      .modal-frames-label {
+        font-size: 1.1rem;
+        font-weight: var(--font-bold);
+        color: #000;
+        line-height: 1.2;
+      }
+
+      .modal-frames-bestof {
+        font-size: 0.7rem;
         font-weight: var(--font-semibold);
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-frames-count {
+        font-size: 3rem;
+        font-weight: var(--font-extrabold);
+        color: #000;
+        min-width: 50px;
+        text-align: center;
       }
 
       .modal-breaks-row {
@@ -2236,6 +2230,84 @@
         font-weight: var(--font-bold);
         color: rgba(255, 255, 255, 0.9);
         padding: 0 var(--spacing-4);
+      }
+
+      /* Match Statistics Section */
+      .match-stats-section {
+        margin-bottom: var(--spacing-6);
+      }
+
+      .match-stats-title {
+        font-size: 1.3rem;
+        font-weight: var(--font-bold);
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: var(--spacing-4);
+      }
+
+      .match-stats-grid {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .match-stats-header {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        padding: var(--spacing-3) var(--spacing-5);
+        background: rgba(255, 255, 255, 0.04);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .match-stats-header .mst-p1 {
+        font-size: 0.75rem;
+        font-weight: var(--font-bold);
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .match-stats-header .mst-p2 {
+        font-size: 0.75rem;
+        font-weight: var(--font-bold);
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: right;
+      }
+
+      .match-stats-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        padding: var(--spacing-3) var(--spacing-5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        align-items: center;
+      }
+
+      .match-stats-row:last-child {
+        border-bottom: none;
+      }
+
+      .mst-val {
+        font-size: 1rem;
+        font-weight: var(--font-extrabold);
+        color: #fff;
+      }
+
+      .mst-val:last-child {
+        text-align: right;
+      }
+
+      .mst-val.foul {
+        color: #ef4444;
+      }
+
+      .mst-label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.45);
+        text-align: center;
+        padding: 0 var(--spacing-4);
+        white-space: nowrap;
       }
 
       /* Mobile Responsive */
@@ -2271,18 +2343,21 @@
           height: 32px;
         }
 
-        .modal-frames-numbers {
-          font-size: 2rem;
-        }
-
-        .modal-score-left,
-        .modal-score-right {
-          font-size: 3rem;
+        .modal-frames-count {
+          font-size: 2.2rem;
         }
 
         .modal-break-left,
         .modal-break-right {
           font-size: 1rem;
+        }
+
+        .mst-val {
+          font-size: 0.9rem;
+        }
+
+        .mst-label {
+          font-size: 0.65rem;
         }
       }
 
@@ -4200,6 +4275,35 @@
           `;
         }
 
+        // Compute match-level statistics from frame actions
+        const matchStats = { p1: { totalPts: 0, fouls: 0, foulPts: 0, visits: 0 }, p2: { totalPts: 0, fouls: 0, foulPts: 0, visits: 0 } };
+        const statsStack = [];
+        frameActions.forEach(a => {
+          const at = a.actionType.toUpperCase();
+          if (at === 'UNDO') {
+            const prev = statsStack.pop();
+            if (prev) {
+              prev.target.totalPts -= prev.points;
+              if (prev.wasFoul) { prev.committer.fouls--; prev.committer.foulPts -= prev.points; }
+              if (prev.wasVisit) { prev.scorer.visits--; }
+            }
+          } else if (at === 'FOUL' && a.points > 0) {
+            const committer = a.playerIndex === 1 ? matchStats.p1 : matchStats.p2;
+            const target = a.playerIndex === 1 ? matchStats.p2 : matchStats.p1;
+            target.totalPts += a.points;
+            committer.fouls++;
+            committer.foulPts += a.points;
+            statsStack.push({ target, points: a.points, wasFoul: true, committer, wasVisit: false, scorer: null });
+          } else if (isDirectScoreAction(at) && a.points > 0) {
+            const scorer = a.playerIndex === 1 ? matchStats.p1 : matchStats.p2;
+            scorer.totalPts += a.points;
+            scorer.visits++;
+            statsStack.push({ target: scorer, points: a.points, wasFoul: false, committer: null, wasVisit: true, scorer });
+          }
+        });
+        const p1Avg = matchStats.p1.visits > 0 ? (matchStats.p1.totalPts / matchStats.p1.visits).toFixed(1) : '0';
+        const p2Avg = matchStats.p2.visits > 0 ? (matchStats.p2.totalPts / matchStats.p2.visits).toFixed(1) : '0';
+
         // Build modal content
         modalBody.innerHTML = `
           <div class="modal-scoreboard">
@@ -4227,34 +4331,66 @@
             </div>
 
             <div class="modal-frames-bar">
-              <span class="modal-frames-label">Frames</span>
-              <div class="modal-frames-numbers">
-                <span>${matchData.player1Frames}</span>
-                <span>${matchData.bestOf}</span>
-                <span>${matchData.player2Frames}</span>
+              <span class="modal-frames-count">${matchData.player1Frames}</span>
+              <div class="modal-frames-center">
+                <span class="modal-frames-label">Frames</span>
+                <span class="modal-frames-bestof">Best of ${matchData.bestOf}</span>
               </div>
-            </div>
-
-            <div class="modal-scores-row">
-              <span class="modal-score-left">${matchData.player1Score}</span>
-              <span class="modal-score-label">Score</span>
-              <span class="modal-score-right">${matchData.player2Score}</span>
+              <span class="modal-frames-count">${matchData.player2Frames}</span>
             </div>
 
             <div class="modal-breaks-row">
               <span class="modal-break-left">
                 ${matchData.player1Breaks && matchData.player1Breaks.length > 0
                   ? matchData.player1Breaks.join(', ')
-                  : '0'}
+                  : '-'}
               </span>
               <span class="modal-breaks-label">Breaks</span>
               <span class="modal-break-right">
                 ${matchData.player2Breaks && matchData.player2Breaks.length > 0
                   ? matchData.player2Breaks.join(', ')
-                  : '0'}
+                  : '-'}
               </span>
             </div>
           </div>
+
+          ${frameActions.length > 0 ? `
+          <div class="match-stats-section">
+            <div class="match-stats-title">Match Statistics</div>
+            <div class="match-stats-grid">
+              <div class="match-stats-header">
+                <span class="mst-p1">${matchData.player1Name}</span>
+                <span class="mst-label"></span>
+                <span class="mst-p2">${matchData.player2Name}</span>
+              </div>
+              <div class="match-stats-row">
+                <span class="mst-val">${matchStats.p1.totalPts}</span>
+                <span class="mst-label">Total Points</span>
+                <span class="mst-val">${matchStats.p2.totalPts}</span>
+              </div>
+              <div class="match-stats-row">
+                <span class="mst-val">${matchStats.p1.visits}</span>
+                <span class="mst-label">Scoring Visits</span>
+                <span class="mst-val">${matchStats.p2.visits}</span>
+              </div>
+              <div class="match-stats-row">
+                <span class="mst-val">${p1Avg}</span>
+                <span class="mst-label">Avg. Points / Visit</span>
+                <span class="mst-val">${p2Avg}</span>
+              </div>
+              <div class="match-stats-row">
+                <span class="mst-val">${matchStats.p1.fouls}</span>
+                <span class="mst-label">Fouls</span>
+                <span class="mst-val">${matchStats.p2.fouls}</span>
+              </div>
+              <div class="match-stats-row">
+                <span class="mst-val foul">${matchStats.p1.foulPts}</span>
+                <span class="mst-label">Foul Pts Given Away</span>
+                <span class="mst-val foul">${matchStats.p2.foulPts}</span>
+              </div>
+            </div>
+          </div>
+          ` : ''}
 
           ${frameBreakdownHTML}
         `;
@@ -5646,6 +5782,9 @@
 
         if (isLiveScoresPage) {
           setInterval(() => {
+            // Skip refresh while modal is open
+            const modal = document.getElementById('matchDetailsModal');
+            if (modal && modal.style.display === 'flex') return;
             const grid = document.querySelector(".scoreboard-grid");
             if (grid) grid.classList.add("no-animate");
             createScoreboardGrid();
