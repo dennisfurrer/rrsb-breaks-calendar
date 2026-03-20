@@ -1994,8 +1994,7 @@
         align-items: center;
         justify-content: center;
         animation: fadeIn 0.3s ease;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
       }
 
       .match-modal-content {
@@ -2163,11 +2162,61 @@
         color: #fff;
       }
 
+      /* Live mode frames bar (default) */
       .modal-frames-bar {
         background: linear-gradient(135deg, #f59e0b, #d97706);
         border-radius: 12px;
-        padding: var(--spacing-4) var(--spacing-6);
+        padding: var(--spacing-4);
         margin-bottom: var(--spacing-4);
+        text-align: center;
+      }
+
+      .modal-frames-label {
+        display: block;
+        font-size: 1.2rem;
+        font-weight: var(--font-bold);
+        color: #000;
+        margin-bottom: var(--spacing-2);
+      }
+
+      .modal-frames-numbers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--spacing-6);
+        font-size: 2.5rem;
+        font-weight: var(--font-extrabold);
+        color: #000;
+      }
+
+      /* Live mode score row */
+      .modal-scores-row {
+        background: rgba(100, 100, 100, 0.4);
+        border-radius: 12px;
+        padding: var(--spacing-6);
+        margin-bottom: var(--spacing-4);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-score-left,
+      .modal-score-right {
+        font-size: 4rem;
+        font-weight: var(--font-extrabold);
+        color: #fff;
+      }
+
+      .modal-score-label {
+        font-size: 1.5rem;
+        font-weight: var(--font-semibold);
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      /* Finished mode frames bar */
+      .modal-frames-bar.finished {
+        padding: var(--spacing-4) var(--spacing-6);
+        text-align: initial;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -2179,10 +2228,10 @@
         align-items: center;
       }
 
-      .modal-frames-label {
+      .modal-frames-bar.finished .modal-frames-label {
+        display: inline;
         font-size: 1.1rem;
-        font-weight: var(--font-bold);
-        color: #000;
+        margin-bottom: 0;
         line-height: 1.2;
       }
 
@@ -2341,6 +2390,15 @@
         .modal-flag {
           width: 48px;
           height: 32px;
+        }
+
+        .modal-frames-numbers {
+          font-size: 2rem;
+        }
+
+        .modal-score-left,
+        .modal-score-right {
+          font-size: 3rem;
         }
 
         .modal-frames-count {
@@ -4304,6 +4362,9 @@
         const p1Avg = matchStats.p1.visits > 0 ? (matchStats.p1.totalPts / matchStats.p1.visits).toFixed(1) : '0';
         const p2Avg = matchStats.p2.visits > 0 ? (matchStats.p2.totalPts / matchStats.p2.visits).toFixed(1) : '0';
 
+        // Determine mode: live (active match) vs finished (ended/historical)
+        const isLiveMode = matchData.active === true;
+
         // Build modal content
         modalBody.innerHTML = `
           <div class="modal-scoreboard">
@@ -4330,7 +4391,37 @@
               </div>
             </div>
 
+            ${isLiveMode ? `
             <div class="modal-frames-bar">
+              <span class="modal-frames-label">Frames</span>
+              <div class="modal-frames-numbers">
+                <span>${matchData.player1Frames}</span>
+                <span>${matchData.bestOf}</span>
+                <span>${matchData.player2Frames}</span>
+              </div>
+            </div>
+
+            <div class="modal-scores-row">
+              <span class="modal-score-left">${matchData.player1Score}</span>
+              <span class="modal-score-label">Score</span>
+              <span class="modal-score-right">${matchData.player2Score}</span>
+            </div>
+
+            <div class="modal-breaks-row">
+              <span class="modal-break-left">
+                ${matchData.player1Breaks && matchData.player1Breaks.length > 0
+                  ? matchData.player1Breaks.join(', ')
+                  : '0'}
+              </span>
+              <span class="modal-breaks-label">Breaks</span>
+              <span class="modal-break-right">
+                ${matchData.player2Breaks && matchData.player2Breaks.length > 0
+                  ? matchData.player2Breaks.join(', ')
+                  : '0'}
+              </span>
+            </div>
+            ` : `
+            <div class="modal-frames-bar finished">
               <span class="modal-frames-count">${matchData.player1Frames}</span>
               <div class="modal-frames-center">
                 <span class="modal-frames-label">Frames</span>
@@ -4352,9 +4443,10 @@
                   : '-'}
               </span>
             </div>
+            `}
           </div>
 
-          ${frameActions.length > 0 ? `
+          ${!isLiveMode && frameActions.length > 0 ? `
           <div class="match-stats-section">
             <div class="match-stats-title">Match Statistics</div>
             <div class="match-stats-grid">
